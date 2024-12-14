@@ -1,0 +1,31 @@
+﻿-- base.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Music App{% endblock %}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/users">Usuarios</a></li>
+                <li><a href="/songs">Canciones</a></li>
+                <li><a href="/podcast">Podcast</a></li>
+                <li><a href="/playlists">Playlists</a></li>
+                <li><a href="/albums">Albums</a></li>
+                <li><a href="/authors">Autores</a></li>
+                <li><a href="/historial">Historial</a></li>
+                <li><a href="/discografica">Discografica</a></li>
+                <li><a href="/genere">Generos</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

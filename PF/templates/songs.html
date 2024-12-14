@@ -1,0 +1,44 @@
+-- songs.html
+{% extends "base.html" %}
+
+{% block title %}Songs{% endblock %}
+
+{% block content %}
+<h1>Songs</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Album ID</th>
+            <th>Author ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for song in canciones %}
+        <tr>
+            <td>{{ song[0] }}</td>
+            <td>{{ song[1] }}</td>
+            <td>{{ song[2] }}</td>
+            <td>{{ song[3] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h2>Add Song</h2>
+<form method="POST" action="/songs/add">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required>
+    <label for="album_id">Album ID:</label>
+    <input type="number" id="album_id" name="album_id" required>
+    <label for="author_id">Author ID:</label>
+    <input type="number" id="author_id" name="author_id" required>
+    <button type="submit">Add</button>
+</form>
+<h2>Delete Song</h2>
+<form method="POST" action="/songs/delete">
+    <label for="id">Song ID:</label>
+    <input type="number" id="id" name="id" required>
+    <button type="submit">Delete</button>
+</form>
+{% endblock %}

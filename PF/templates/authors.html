@@ -1,0 +1,30 @@
+-- authors.html
+{% extends "base.html" %}
+
+{% block title %}Authors{% endblock %}
+
+{% block content %}
+<h1>Authors</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for author in authors %}
+        <tr>
+            <td>{{ author[0] }}</td>
+            <td>{{ author[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h2>Add Author</h2>
+<form method="POST" action="/authors/add">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <button type="submit">Add</button>
+</form>
+{% endblock %}

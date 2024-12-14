@@ -1,0 +1,44 @@
+-- playlists.html
+{% extends "base.html" %}
+
+{% block title %}Playlists{% endblock %}
+
+{% block content %}
+<h1>Playlists</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for playlist in playlists %}
+        <tr>
+            <td>{{ playlist[0] }}</td>
+            <td>{{ playlist[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h2>Add Playlist</h2>
+<form method="POST" action="/playlists/add">
+  <label for="name">Nombre de la Playlist:</label>
+  <input type="text" id="name" name="name" required>
+  <button type="submit">Agregar Playlist</button>
+</form>
+<h2>Delete Playlist</h2>
+<form method="POST" action="/playlists/delete">
+    <label for="id">Playlist ID:</label>
+    <input type="number" id="id" name="id" required>
+    <button type="submit">Delete</button>
+</form>
+<h2>Remove Song from Playlist</h2>
+<form method="POST" action="/playlists/remove_song">
+    <label for="playlist_id">Playlist ID:</label>
+    <input type="number" id="playlist_id" name="playlist_id" required>
+    <label for="song_id">Song ID:</label>
+    <input type="number" id="song_id" name="song_id" required>
+    <button type="submit">Remove Song</button>
+</form>
+{% endblock %}
