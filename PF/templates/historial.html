@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Historial{% endblock %}
+
+{% block content %}
+<div class="content">
+    <h1>Historial</h1>
+
+    <!-- Tabla de Historial -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID Historial</th>
+                <th>Reproducciones</th>
+                <th>Usuarios</th>
+                <th>Canciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for historial in historiales %}
+            <tr>
+                <td>{{ historial.id_historial }}</td>
+                <td>{{ historial.n_reproduccion }}</td>
+                <td>
+                    {% if historial.usuarios %}
+                        <ul>
+                            {% for usuario in historial.usuarios %}
+                            <li>{{ usuario.nombre }} (ID: {{ usuario.id_usuario }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <em>No users in this historial.</em>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if historial.canciones %}
+                        <ul>
+                            {% for cancion in historial.canciones %}
+                            <li>{{ cancion.nombre }} (ID: {{ cancion.id_cancion }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <em>No songs in this historial.</em>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Add Historial</h2>
+    <form method="POST" action="/historial/add">
+        <label for="id_usuario">User:</label>
+        <select name="id_usuario" id="id_usuario" required>
+            {% for usuario in usuarios %}
+                <option value="{{ usuario[0] }}">{{ usuario[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="id_cancion">Song:</label>
+        <select name="id_cancion" id="id_cancion" required>
+            {% for cancion in canciones %}
+                <option value="{{ cancion[0] }}">{{ cancion[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Add Historial</button>
+    </form>
+
+    <h2>Increment Reproductions</h2>
+    <form method="POST" action="/historial/increment">
+        <label for="id_historial">Historial:</label>
+        <select name="id_historial" id="id_historial" required>
+            {% for historial in historiales %}
+                <option value="{{ historial.id_historial }}">{{ historial.id_historial }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Increment Reproductions</button>
+    </form>
+
+    <h2>Delete Historial</h2>
+    <form method="POST" action="/historial/delete">
+        <label for="id_historial">Historial:</label>
+        <select name="id_historial" id="id_historial" required>
+            {% for historial in historiales %}
+                <option value="{{ historial.id_historial }}">{{ historial.id_historial }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Delete Historial</button>
+    </form>
+</div>
+{% endblock %}

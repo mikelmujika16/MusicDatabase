@@ -7,7 +7,7 @@ app = Flask(__name__)
 conn = psycopg2.connect(
     dbname="music_db",
     user="postgres",
-    password="usuario",
+    password="admin",
     host="localhost"
 )
 cursor = conn.cursor()
@@ -34,7 +34,7 @@ def index():
         elif table == 'Canciones':
             cursor.execute("SELECT * FROM Canciones")
             rows = cursor.fetchall()
-            columns = ['ID', 'Song Name', 'Duration', 'Release Year']
+            columns = ['ID', 'Song Name', 'Duration', 'Reproductions', 'Release Year']
         elif table == 'Podcast':
             cursor.execute("SELECT * FROM Podcast")
             rows = cursor.fetchall()
@@ -685,41 +685,8 @@ def authors():
     cursor.execute("SELECT * FROM Autores")
     authors = cursor.fetchall()
 
-    # Obtener las canciones asociadas a cada autor
-    authors_with_songs_and_genres = []
-    for author in authors:
-        cursor.execute("""
-            SELECT c.nombre_cancion
-            FROM Canciones c
-            JOIN Canciones_Autores ca ON c.id_cancion = ca.id_cancion
-            WHERE ca.id_autor = %s
-        """, (author[0],))
-        songs = cursor.fetchall()
+    return render_template('authors.html', authors=authors)
 
-        # Obtener los géneros asociados a este autor
-        cursor.execute("""
-            SELECT g.nombre_genero
-            FROM Generos g
-            JOIN Genero_Autores ga ON g.id_genero = ga.id_genero
-            WHERE ga.id_autor = %s
-        """, (author[0],))
-        genres = cursor.fetchall()
-
-        authors_with_songs_and_genres.append({
-            'author': author,
-            'songs': [song[0] for song in songs],  # Solo obtener el nombre de la canción
-            'genres': [genre[0] for genre in genres]  # Solo obtener el nombre del género
-        })
-
-    # Obtener todos los géneros disponibles
-    cursor.execute("SELECT * FROM Generos")
-    generos = cursor.fetchall()
-
-    # Obtener todas las canciones disponibles
-    cursor.execute("SELECT * FROM Canciones")
-    canciones = cursor.fetchall()
-
-    return render_template('authors.html',  authors_with_songs_and_genres=authors_with_songs_and_genres, generos=generos, canciones=canciones)
 
 @app.route('/authors/add', methods=['POST'])
 def add_author():
@@ -770,39 +737,13 @@ def update_author():
     
     return redirect(url_for('authors'))
 
-@app.route('/authors/add_song', methods=['POST'])
-def add_song_to_author():
-    id_autor = request.form['id_autor']
-    id_cancion = request.form['id_cancion']
-    # Insertar la nueva canción en la relación
-    cursor.execute("""
-        INSERT INTO Canciones_Autores (id_cancion, id_autor) VALUES (%s, %s)
-    """, (id_cancion, id_autor))
-    conn.commit()
-
-    return redirect(url_for('authors'))
-
-@app.route('/authors/add_genre', methods=['POST'])
-def add_genre_to_author():
-    id_autor = request.form['id_autor']
-    id_genero = request.form['id_genero']
-
-    # Insertar la relación entre autor y género en la tabla Genero_Autores
-    cursor.execute("""
-        INSERT INTO Genero_Autores (id_autor, id_genero) VALUES (%s, %s)
-    """, (id_autor, id_genero))
-    conn.commit()
-
-    return redirect(url_for('authors'))
-
 
 # ---------------------- Rutas de Grupos ----------------------
 @app.route('/grupos')
 def grupos():
     cursor.execute("""
-        SELECT g.id_autor, g.nombre_grupo, a.nombre_autor
+        SELECT g.id_autor, g.nombre_grupo
         FROM Grupos g
-        JOIN Autores a ON g.id_autor = a.id_autor
     """)
     grupos = cursor.fetchall()
     return render_template('group.html', grupos=grupos)
@@ -810,23 +751,41 @@ def grupos():
 @app.route('/grupos/add_author', methods=['POST'])
 def add_author_to_group():
     id_autor = request.form['id_autor']
-    nombre_grupo = request.form['nombre_grupo']
 
-    # Verificar si el autor y el grupo existen y si no agregar
+    # Obtener el nombre del autor asociado a id_autor
+    cursor.execute("SELECT nombre_autor FROM Autores WHERE id_autor = %s", (id_autor,))
+    autor = cursor.fetchone()
+
+    if autor:
+        nombre_grupo = autor[0]
+
+        # Insertar en la tabla Grupos
+        cursor.execute("""
+            INSERT INTO Grupos (id_autor, nombre_grupo) 
+            VALUES (%s, %s)
+        """, (id_autor, nombre_grupo))
+        conn.commit()
+
+    return redirect(url_for('grupos'))
+
+@app.route('/grupos/delete', methods=['POST'])
+def delete_group():
+    id_autor = request.form['id_autor']
+
     cursor.execute("""
-        INSERT INTO Grupos (id_autor, nombre_grupo) 
-        VALUES (%s, %s)
-    """, (id_autor, nombre_grupo))
+        DELETE FROM Grupos
+        WHERE id_autor = %s
+    """, (id_autor,))
     conn.commit()
+
     return redirect(url_for('grupos'))
 
 # ---------------------- Rutas de Artistas ----------------------
 @app.route('/artistas')
 def artistas():
     cursor.execute("""
-        SELECT a.id_autor, a.nombre_artista, b.nombre_autor
-        FROM Artista a
-        JOIN Autores b ON a.id_autor = b.id_autor
+        SELECT id_autor, nombre_artista
+        FROM Artista
     """)
     artistas = cursor.fetchall()
     return render_template('artist.html', artistas=artistas)
@@ -834,38 +793,270 @@ def artistas():
 @app.route('/artistas/add_author', methods=['POST'])
 def add_author_to_artist():
     id_autor = request.form['id_autor']
-    nombre_artista = request.form['nombre_artista']
 
-    # Verificar si el autor y el artista existen y si no agregar
-    cursor.execute("""
-        INSERT INTO Artista (id_autor, nombre_artista) 
-        VALUES (%s, %s)
-    """, (id_autor, nombre_artista))
-    conn.commit()
+    # Obtener el nombre del autor asociado a id_autor
+    cursor.execute("SELECT nombre_autor FROM Autores WHERE id_autor = %s", (id_autor,))
+    autor = cursor.fetchone()
+
+    if autor:
+        nombre_artista = autor[0]
+
+        # Insertar en la tabla Artista
+        cursor.execute("""
+            INSERT INTO Artista (id_autor, nombre_artista) 
+            VALUES (%s, %s)
+        """, (id_autor, nombre_artista))
+        conn.commit()
+
     return redirect(url_for('artistas'))
 
+@app.route('/artistas/delete', methods=['POST'])
+def delete_artist():
+    id_autor = request.form['id_autor']
+
+    cursor.execute("""
+        DELETE FROM Artista
+        WHERE id_autor = %s
+    """, (id_autor,))
+    conn.commit()
+
+    return redirect(url_for('artistas'))
 
 # ---------------------- Rutas de Hosts ----------------------
 @app.route('/hosts')
 def hosts():
     cursor.execute("""
-        SELECT h.id_autor, h.nombre_host, a.nombre_autor
-        FROM Hosts h
-        JOIN Autores a ON h.id_autor = a.id_autor
+        SELECT id_autor, nombre_host
+        FROM Hosts
     """)
     hosts = cursor.fetchall()
     return render_template('host.html', hosts=hosts)
 
-
 @app.route('/hosts/add_author', methods=['POST'])
 def add_author_to_host():
     id_autor = request.form['id_autor']
-    nombre_host = request.form['nombre_host']
 
-    # Verificar si el autor y el host existen y si no agregar
-    cursor.execute("""
-        INSERT INTO Hosts (id_autor, nombre_host) 
-        VALUES (%s, %s)
-    """, (id_autor, nombre_host))
-    conn.commit()
+    # Obtener el nombre del autor asociado a id_autor
+    cursor.execute("SELECT nombre_autor FROM Autores WHERE id_autor = %s", (id_autor,))
+    autor = cursor.fetchone()
+
+    if autor:
+        nombre_host = autor[0]
+
+        # Insertar en la tabla Hosts
+        cursor.execute("""
+            INSERT INTO Hosts (id_autor, nombre_host) 
+            VALUES (%s, %s)
+        """, (id_autor, nombre_host))
+        conn.commit()
+
     return redirect(url_for('hosts'))
+
+@app.route('/hosts/delete', methods=['POST'])
+def delete_host():
+    id_autor = request.form['id_autor']
+
+    cursor.execute("""
+        DELETE FROM Hosts
+        WHERE id_autor = %s
+    """, (id_autor,))
+    conn.commit()
+
+    return redirect(url_for('hosts'))
+# ---------------------- Rutas de Historial ----------------------
+
+@app.route('/historial')
+def historial():
+    # Obtener todos los historiales
+    cursor.execute("SELECT * FROM Historial")
+    historiales = cursor.fetchall()
+
+    historiales_con_detalles = []
+    for historial in historiales:
+        # Obtener los usuarios asociados a este historial
+        cursor.execute("""
+            SELECT u.id_usuario, u.nombre
+            FROM Usuarios u
+            JOIN Usuarios_Historial uh ON u.id_usuario = uh.id_usuario
+            WHERE uh.id_historial = %s
+        """, (historial[0],))
+        usuarios = cursor.fetchall()
+
+        # Obtener las canciones asociadas a este historial
+        cursor.execute("""
+            SELECT c.id_cancion, c.nombre_cancion
+            FROM Canciones c
+            JOIN Historial_Cancion hc ON c.id_cancion = hc.id_cancion
+            WHERE hc.id_historial = %s
+        """, (historial[0],))
+        canciones = cursor.fetchall()
+
+        historiales_con_detalles.append({
+            'id_historial': historial[0],
+            'n_reproduccion': historial[1],
+            'usuarios': [{'id_usuario': u[0], 'nombre': u[1]} for u in usuarios],
+            'canciones': [{'id_cancion': c[0], 'nombre': c[1]} for c in canciones]
+        })
+
+    # Obtener todos los usuarios y canciones para los selectores
+    cursor.execute("SELECT id_usuario, nombre FROM Usuarios ORDER BY id_usuario ASC")
+    usuarios = cursor.fetchall()
+
+    cursor.execute("SELECT id_cancion, nombre_cancion FROM Canciones ORDER BY id_cancion ASC")
+    canciones = cursor.fetchall()
+
+    return render_template('historial.html', historiales=historiales_con_detalles, usuarios=usuarios, canciones=canciones)
+@app.route('/historial/add', methods=['GET', 'POST'])
+def add_historial():
+    if request.method == 'POST':
+        id_usuario = request.form['id_usuario']
+        id_cancion = request.form['id_cancion']
+
+        # Insertar en la tabla Historial
+        cursor.execute("""
+            INSERT INTO Historial (n_reproduccion) 
+            VALUES (0) 
+            RETURNING id_historial
+        """)
+        id_historial = cursor.fetchone()[0]
+
+        # Insertar en la tabla Usuarios_Historial
+        cursor.execute("""
+            INSERT INTO Usuarios_Historial (id_usuario, id_historial) 
+            VALUES (%s, %s)
+        """, (id_usuario, id_historial))
+
+        # Insertar en la tabla Historial_Cancion
+        cursor.execute("""
+            INSERT INTO Historial_Cancion (id_historial, id_cancion) 
+            VALUES (%s, %s)
+        """, (id_historial, id_cancion))
+
+        conn.commit()
+        return redirect(url_for('historial'))
+
+    # Obtener todos los usuarios y canciones para los selectores
+    cursor.execute("SELECT id_usuario, nombre FROM Usuarios ORDER BY id_usuario ASC")
+    usuarios = cursor.fetchall()
+
+    cursor.execute("SELECT id_cancion, nombre_cancion FROM Canciones ORDER BY id_cancion ASC")
+    canciones = cursor.fetchall()
+
+    return render_template('add_historial.html', usuarios=usuarios, canciones=canciones)
+
+@app.route('/historial/increment', methods=['POST'])
+def increment_reproductions():
+    id_historial = request.form['id_historial']
+
+    # Incrementar el número de reproducciones en 1
+    cursor.execute("""
+        UPDATE Historial
+        SET n_reproduccion = n_reproduccion + 1
+        WHERE id_historial = %s
+    """, (id_historial,))
+    conn.commit()
+
+    return redirect(url_for('historial'))
+
+@app.route('/historial/delete', methods=['POST'])
+def delete_historial():
+    id_historial = request.form['id_historial']
+
+    # Eliminar el historial de la base de datos
+    cursor.execute("DELETE FROM Historial WHERE id_historial = %s", (id_historial,))
+    conn.commit()
+
+    return redirect(url_for('historial'))
+
+#---------------------- Rutas de Discográficas ----------------------
+@app.route('/discografica')
+def discografica():
+    cursor.execute("""
+        SELECT id_discografia, nombre_discografica, ubicacion
+        FROM Discograficas
+    """)
+    discograficas = cursor.fetchall()
+    return render_template('discografica.html', discograficas=discograficas)
+
+@app.route('/discografica/add', methods=['POST'])
+def add_discografica():
+    nombre_discografica = request.form['nombre_discografica']
+    ubicacion = request.form['ubicacion']
+
+    cursor.execute("""
+        INSERT INTO Discograficas (nombre_discografica, ubicacion)
+        VALUES (%s, %s)
+    """, (nombre_discografica, ubicacion))
+    conn.commit()
+
+    return redirect(url_for('discografica'))
+
+@app.route('/discografica/update', methods=['POST'])
+def update_discografica():
+    id_discografia = request.form['id_discografia']
+    nombre_discografica = request.form['nombre_discografica']
+    ubicacion = request.form['ubicacion']
+
+    cursor.execute("""
+        UPDATE Discograficas
+        SET nombre_discografica = %s, ubicacion = %s
+        WHERE id_discografia = %s
+    """, (nombre_discografica, ubicacion, id_discografia))
+    conn.commit()
+
+    return redirect(url_for('discografica'))
+
+@app.route('/discografica/delete', methods=['POST'])
+def delete_discografica():
+    id_discografia = request.form['id_discografia']
+
+    cursor.execute("DELETE FROM Discograficas WHERE id_discografia = %s", (id_discografia,))
+    conn.commit()
+
+    return redirect(url_for('discografica'))
+
+# ---------------------- Rutas de Géneros ----------------------
+
+@app.route('/genre')
+def genre():
+    cursor.execute("""
+        SELECT id_genero, nombre_genero
+        FROM Generos
+    """)
+    generos = cursor.fetchall()
+    return render_template('genre.html', generos=generos)
+
+@app.route('/genre/add', methods=['POST'])
+def add_genre():
+    nombre_genero = request.form['nombre_genero']
+
+    cursor.execute("""
+        INSERT INTO Generos (nombre_genero)
+        VALUES (%s)
+    """, (nombre_genero,))
+    conn.commit()
+
+    return redirect(url_for('genre'))
+
+@app.route('/genre/update', methods=['POST'])
+def update_genre():
+    id_genero = request.form['id_genero']
+    nombre_genero = request.form['nombre_genero']
+
+    cursor.execute("""
+        UPDATE Generos
+        SET nombre_genero = %s
+        WHERE id_genero = %s
+    """, (nombre_genero, id_genero))
+    conn.commit()
+
+    return redirect(url_for('genre'))
+
+@app.route('/genre/delete', methods=['POST'])
+def delete_genre():
+    id_genero = request.form['id_genero']
+
+    cursor.execute("DELETE FROM Generos WHERE id_genero = %s", (id_genero,))
+    conn.commit()
+
+    return redirect(url_for('genre'))

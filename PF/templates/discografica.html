@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Discograficas{% endblock %}
+
+{% block content %}
+<div class="content">
+    <h1>Discograficas</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for discografica in discograficas %}
+            <tr>
+                <td>{{ discografica[0] }}</td>
+                <td>{{ discografica[1] }}</td>
+                <td>{{ discografica[2] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Add Discografica</h2>
+    <form method="POST" action="/discografica/add">
+        <label for="nombre_discografica">Name:</label>
+        <input type="text" id="nombre_discografica" name="nombre_discografica" required>
+        
+        <label for="ubicacion">Location:</label>
+        <input type="text" id="ubicacion" name="ubicacion" required>
+        
+        <button type="submit">Add Discografica</button>
+    </form>
+
+    <h2>Update Discografica</h2>
+    <form method="POST" action="/discografica/update">
+        <label for="id_discografia">ID:</label>
+        <input type="number" id="id_discografia" name="id_discografia" required>
+        
+        <label for="nombre_discografica">New Name:</label>
+        <input type="text" id="nombre_discografica" name="nombre_discografica">
+        
+        <label for="ubicacion">New Location:</label>
+        <input type="text" id="ubicacion" name="ubicacion">
+        
+        <button type="submit">Update Discografica</button>
+    </form>
+
+    <h2>Delete Discografica</h2>
+    <form method="POST" action="/discografica/delete">
+        <label for="id_discografia">ID:</label>
+        <input type="number" id="id_discografia" name="id_discografia" required>
+        
+        <button type="submit">Delete Discografica</button>
+    </form>
+</div>
+{% endblock %}

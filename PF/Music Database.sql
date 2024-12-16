@@ -97,8 +97,9 @@ CREATE TABLE Autores (
 );
 
 -- Tabla: Grupo
+-- Tabla: Grupo
 CREATE TABLE Grupos (
-    id_autor SERIAL,
+    id_autor INTEGER,
     nombre_grupo VARCHAR(150) NOT NULL,
     PRIMARY KEY (id_autor, nombre_grupo),
     FOREIGN KEY (id_autor) REFERENCES Autores(id_autor) ON DELETE CASCADE
@@ -106,7 +107,7 @@ CREATE TABLE Grupos (
 
 -- Tabla: Artista
 CREATE TABLE Artista (
-    id_autor SERIAL,
+    id_autor INTEGER,
     nombre_artista VARCHAR(150) NOT NULL,
     PRIMARY KEY (id_autor, nombre_artista),
     FOREIGN KEY (id_autor) REFERENCES Autores(id_autor) ON DELETE CASCADE
@@ -114,9 +115,9 @@ CREATE TABLE Artista (
 
 -- Tabla: Host
 CREATE TABLE Hosts (
-    id_autor SERIAL,
+    id_autor INTEGER,
     nombre_host VARCHAR(150) NOT NULL,
-    PRIMARY KEY (id_autor,nombre_host),
+    PRIMARY KEY (id_autor, nombre_host),
     FOREIGN KEY (id_autor) REFERENCES Autores(id_autor) ON DELETE CASCADE
 );
 
@@ -362,16 +363,16 @@ FOR EACH ROW
 EXECUTE FUNCTION validar_duracion_playlist();
 -- Inserts para la tabla Usuarios
 INSERT INTO Usuarios (nombre, apellido, nickname, email) VALUES
-('Juan', 'Pérez', 'juanp', 'juan.perez@example.com'),
-('Ana', 'Gómez', 'anag', 'ana.gomez@example.com'),
-('Luis', 'Martínez', 'luism', 'luis.martinez@example.com'),
-('María', 'López', 'marial', 'maria.lopez@example.com'),
-('Carlos', 'Fernández', 'carlitof', 'carlos.fernandez@example.com'),
-('Sofía', 'Hernández', 'sofiaher', 'sofia.hernandez@example.com'),
-('Pedro', 'Sánchez', 'pedros', 'pedro.sanchez@example.com'),
-('Laura', 'Ramírez', 'laurar', 'laura.ramirez@example.com'),
-('Javier', 'García', 'javiers', 'javier.garcia@example.com'),
-('Lucía', 'Martín', 'luciama', 'lucia.martin@example.com');
+('Juan', 'Perez', 'juanp', 'juan.perez@example.com'),
+('Ana', 'Gomez', 'anag', 'ana.gomez@example.com'),
+('Luis', 'Martinez', 'luism', 'luis.martinez@example.com'),
+('Maria', 'Lopez', 'marial', 'maria.lopez@example.com'),
+('Carlos', 'Fernandez', 'carlitof', 'carlos.fernandez@example.com'),
+('Sofia', 'Hernandez', 'sofiaher', 'sofia.hernandez@example.com'),
+('Pedro', 'Sanchez', 'pedros', 'pedro.sanchez@example.com'),
+('Laura', 'Ramirez', 'laurar', 'laura.ramirez@example.com'),
+('Javier', 'Garcia', 'javiers', 'javier.garcia@example.com'),
+('Lucia', 'Martin', 'luciama', 'lucia.martin@example.com');
 
 -- Inserts para la tabla Playlists
 INSERT INTO Playlists (nombre_playlist, duracion) VALUES
@@ -408,12 +409,7 @@ INSERT INTO Podcast (nombre_podcast, duracion, reproducciones, fecha_salida) VAL
 ('Tech Talks', '00:50:00', 7000, '2021-08-22'),
 ('The Daily News', '00:30:00', 8000, '2023-03-10'),
 ('Sports Central', '00:40:00', 3000, '2021-11-05'),
-('History Hour', '00:55:00', 9000, '2022-07-12'),
-('Movie Reviews', '00:35:00', 4000, '2020-05-25'),
-('Music Trends', '00:30:00', 6000, '2023-02-13'),
-('Entrepreneurship 101', '00:45:00', 2500, '2021-12-08'),
-('Science Weekly', '00:40:00', 7000, '2022-09-11'),
-('Life Hacks', '00:50:00', 8500, '2023-06-30');
+('History Hour', '00:55:00', 9000, '2022-07-12');
 
 -- Inserts para la tabla Albumes
 INSERT INTO Albumes (nombre_album, duracion, reproduccion, ano_salida) VALUES
@@ -448,50 +444,44 @@ INSERT INTO Autores (nombre_autor, discografia) VALUES
 ('John Lennon', 'Imagine, Double Fantasy, etc.'),
 ('The Weeknd', 'Starboy, After Hours, etc.'),
 ('Don Henley', 'Hotel California, End of the Innocence, etc.'),
-('Adele', '21, 25, 30, etc.'),
-('Camila Cabello', 'Camila, Romance, etc.'),
+('Queen', 'A Night at the Opera, News of the World, etc.'),
+('The Beatles', 'Abbey Road, Let It Be, etc.'),
 ('Coldplay', 'Parachutes, X&Y, etc.'),
-('Eminem', 'The Eminem Show, Recovery, etc.'),
-('Mark Ronson', 'Uptown Special, Late Night Feelings, etc.');
+('The Rolling Stones', 'Sticky Fingers, Exile on Main St., etc.'),
+('The Chainsmokers', 'Memories...Do Not Open, Sick Boy, etc.'),
+('Joe Rogan', 'The Joe Rogan Experience'),
+('Bill Simmons', 'The Bill Simmons Podcast'),
+('Mark Maron', 'WTF with Marc Maron'),
+('Alex Cooper', 'Call Her Daddy'),
+('David Tennant', 'David Tennant Does a Podcast With...');
 
 -- Inserts para la tabla Grupos
-INSERT INTO Grupos (nombre_grupo) VALUES
-('Queen'),
-('The Beatles'),
-('Coldplay'),
-('The Rolling Stones'),
-('The Chainsmokers'),
-('One Direction'),
-('Imagine Dragons'),
-('Coldplay'),
-('Red Hot Chili Peppers'),
-('Maroon 5');
+INSERT INTO Grupos (id_autor, nombre_grupo) VALUES
+(6, 'Queen'),
+(7, 'The Beatles'),
+(8, 'Coldplay'),
+(9, 'The Rolling Stones'),
+(10, 'The Chainsmokers');
+
 
 -- Inserts para la tabla Artista
-INSERT INTO Artista (nombre_artista) VALUES
-('Freddie Mercury'),
-('Ed Sheeran'),
-('John Lennon'),
-('The Weeknd'),
-('Don Henley'),
-('Adele'),
-('Camila Cabello'),
-('Coldplay'),
-('Eminem'),
-('Mark Ronson');
+INSERT INTO Artista (id_autor, nombre_artista) VALUES
+(1, 'Freddie Mercury'),
+(2, 'Ed Sheeran'),
+(3, 'John Lennon'),
+(4, 'The Weeknd'),
+(5, 'Don Henley');
 
--- Inserts para la tabla Host
-INSERT INTO Hosts (nombre_host) VALUES
-('Joe Rogan'),
-('Bill Simmons'),
-('Mark Maron'),
-('Alex Cooper'),
-('David Tennant'),
-('Dax Shepard'),
-('Chris D’Elia'),
-('Reggie Watts'),
-('Bert Kreischer'),
-('Tom Segura');
+
+-- Inserts para la tabla Hosts
+INSERT INTO Hosts (id_autor, nombre_host) VALUES
+(11, 'Joe Rogan'),
+(12, 'Bill Simmons'),
+(13, 'Mark Maron'),
+(14, 'Alex Cooper'),
+(15, 'David Tennant');
+
+
 
 -- Inserts para la tabla Discograficas
 INSERT INTO Discograficas (nombre_discografica, ubicacion) VALUES
@@ -533,12 +523,7 @@ INSERT INTO Usuarios_Historial (id_usuario, id_historial) VALUES
 (2, 2),
 (3, 3),
 (4, 4),
-(5, 5),
-(6, 1),
-(7, 2),
-(8, 3),
-(9, 4),
-(10, 5);
+(5, 5);
 
 -- Inserts para la tabla Usuarios-Canciones
 INSERT INTO Usuarios_Canciones (id_usuario, id_cancion) VALUES
@@ -573,11 +558,11 @@ INSERT INTO Usuarios_Podcast (id_usuario, id_podcast) VALUES
 (3, 3),
 (4, 4),
 (5, 5),
-(6, 6),
-(7, 7),
-(8, 8),
-(9, 9),
-(10, 10);
+(6, 5),
+(7, 4),
+(8, 3),
+(9, 2),
+(10, 1);
 
 -- Inserts para la tabla Playlist-Cancion
 INSERT INTO Playlist_Cancion (id_playlist, id_cancion) VALUES
@@ -598,12 +583,7 @@ INSERT INTO Historial_Cancion (id_historial, id_cancion) VALUES
 (2, 2),
 (3, 3),
 (4, 4),
-(5, 5),
-(1, 6),
-(2, 7),
-(3, 8),
-(4, 9),
-(5, 10);
+(5, 5);
 
 -- Inserts para la tabla Cancion-Albums
 INSERT INTO Cancion_Albums (id_cancion, id_album) VALUES
@@ -685,16 +665,11 @@ INSERT INTO Albumes_Autor (id_album, id_autor) VALUES
 
 -- Inserts para la tabla Podcast-Autores
 INSERT INTO Podcast_Autores (id_podcast, id_autor) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5),
-(6, 6),
-(7, 7),
-(8, 8),
-(9, 9),
-(10, 10);
+(1, 11),
+(2, 12),
+(3, 13),
+(4, 14),
+(5, 15);
 
 -- Inserts para la tabla Albumes-Discografia-Autor
 INSERT INTO Albumes_Discografias_Autores (id_album, id_autor, id_discografia, fecha_publicacion) VALUES

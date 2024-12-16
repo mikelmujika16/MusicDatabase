@@ -8,23 +8,26 @@
   <table>
       <thead>
           <tr>
+              <th>Author ID</th>
               <th>Group Name</th>
-              <th>Author</th>
           </tr>
       </thead>
       <tbody>
           {% for grupo in grupos %}
           <tr>
+              <td>{{ grupo[0] }}</td>
               <td>{{ grupo[1] }}</td>
-              <td>{{ grupo[2] }}</td>
           </tr>
           {% endfor %}
       </tbody>
   </table>
 
-
-
-
-
+  <h2>Delete Group</h2>
+  <form method="POST" action="/grupos/delete">
+      <label for="id_autor">Author ID:</label>
+      <input type="number" id="id_autor" name="id_autor" required>
+      
+      <button type="submit">Delete Group</button>
+  </form>
 </div>
 {% endblock %}
