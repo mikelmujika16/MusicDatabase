@@ -1,34 +1,125 @@
--- albums.html
 {% extends "base.html" %}
 
 {% block title %}Albums{% endblock %}
 
 {% block content %}
-<h1>Albums</h1>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Author ID</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for album in albums %}
-        <tr>
-            <td>{{ album[0] }}</td>
-            <td>{{ album[1] }}</td>
-            <td>{{ album[2] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<h2>Add Album</h2>
-<form method="POST" action="/albums/add">
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title" required>
-    <label for="duration">Author ID:</label>
-    <input type="number" id="author_id" name="author_id" required>
-    <button type="submit">Add</button>
-</form>
+<div class="content">
+    <h2>Albums</h2>
+    <table >
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Duration</th>
+                <th>Plays</th>
+                <th>Release Year</th>
+                <th>Genres</th>
+                <th>Songs</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for album in albums %}
+            <tr>
+                <td>{{ album[0] }}</td>
+                <td>{{ album[1] }}</td>
+                <td>{{ album[2] }}</td>
+                <td>{{ album[3] }}</td>
+                <td>{{ album[4] }}</td>
+                <td>
+                    {% for genre in albumes_generos[album[0]] %}
+                        {{ genre }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for song in albumes_canciones[album[0]] %}
+                        {{ song }}<br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Create Album</h2>
+    <form method="POST" action="/albums/create">
+        <label for="nombre_album">Album Name:</label>
+        <input type="text" id="nombre_album" name="nombre_album" required>
+
+        <label for="duracion">Duration:</label>
+        <input type="text" id="duracion" name="duracion" required placeholder="00:00:00">
+
+        <label for="reproduccion">Plays:</label>
+        <input type="number" id="reproduccion" name="reproduccion" value="0" required>
+
+        <label for="ano_salida">Release Year:</label>
+        <input type="number" id="ano_salida" name="ano_salida" required>
+
+        <button type="submit">Create Album</button>
+    </form>
+
+    <h2>Delete Album</h2>
+    <form method="POST" action="/albums/delete">
+        <label for="id_album">Album ID:</label>
+        <input type="number" id="id_album" name="id_album" required>
+
+        <button type="submit">Delete Album</button>
+    </form>
+
+    <h2>Update Album</h2>
+    <form method="POST" action="/albums/update">
+        <label for="id_album">Album ID:</label>
+        <input type="number" id="id_album" name="id_album" required>
+
+        <label for="nombre_album">New Album Name:</label>
+        <input type="text" id="nombre_album" name="nombre_album">
+
+        <label for="duracion">New Duration:</label>
+        <input type="text" id="duracion" name="duracion" placeholder="00:00:00">
+
+        <label for="reproduccion">New Plays:</label>
+        <input type="number" id="reproduccion" name="reproduccion">
+
+        <label for="ano_salida">New Release Year:</label>
+        <input type="number" id="ano_salida" name="ano_salida">
+
+        <button type="submit">Update Album</button>
+    </form>
+
+    <h2>Add Song to Album</h2>
+    <form method="POST" action="/albums/add_song">
+        <label for="id_album">Album Name:</label>
+        <select name="id_album" id="id_album" required>
+            {% for album in albums %}
+                <option value="{{ album[0] }}">{{ album[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="nombre_cancion">Song Name:</label>
+        <select name="nombre_cancion" id="nombre_cancion" required>
+            {% for song in canciones %}
+                <option value="{{ song[1] }}">{{ song[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Add Song</button>
+    </form>
+    <h2>Add Genre to Album</h2>
+    <form method="POST" action="/albums/add_genre">
+        <label for="id_album">Album Name:</label>
+        <select name="id_album" id="id_album" required>
+            {% for album in albums %}
+                <option value="{{ album[0] }}">{{ album[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="nombre_genero">Genre Name:</label>
+        <select name="nombre_genero" id="nombre_genero" required>
+            {% for genero in generos %}
+                <option value="{{ genero[1] }}">{{ genero[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Add Genre</button>
+    </form>
+</div>
 {% endblock %}

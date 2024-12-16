@@ -1,9 +1,50 @@
-﻿-- index.html
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
 <h1>Welcome to the Music App</h1>
-<p>Navigate through the menu to manage users, songs, playlists, albums, and authors.</p>
+<p>Navega y comprueba el contenido de las tablas de nuestra base de datos.</p>
+
+<h2>Select a Table to View</h2>
+<form method="POST" action="/">
+    <label for="table">Choose a Table:</label>
+    <select name="table" id="table" required>
+        <option value="Usuarios">Users</option>
+        <option value="Playlists">Playlists</option>
+        <option value="Canciones">Songs</option>
+        <option value="Podcast">Podcasts</option>
+        <option value="Albumes">Albums</option>
+        <option value="Generos">Genres</option>
+        <option value="Autores">Authors</option>
+        <option value="Grupos">Groups</option>
+        <option value="Artista">Artists</option>
+        <option value="Hosts">Hosts</option>
+        <option value="Discograficas">Record Labels</option>
+    </select>
+    <button type="submit">View Table</button>
+</form>
+
+{% if rows %}
+    <h2>Table: {{ table }}</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                {% for column in columns %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
 {% endblock %}

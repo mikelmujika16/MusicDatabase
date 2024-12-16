@@ -1,44 +1,107 @@
--- playlists.html
 {% extends "base.html" %}
 
 {% block title %}Playlists{% endblock %}
 
 {% block content %}
-<h1>Playlists</h1>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for playlist in playlists %}
-        <tr>
-            <td>{{ playlist[0] }}</td>
-            <td>{{ playlist[1] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<h2>Add Playlist</h2>
-<form method="POST" action="/playlists/add">
-  <label for="name">Nombre de la Playlist:</label>
-  <input type="text" id="name" name="name" required>
-  <button type="submit">Agregar Playlist</button>
-</form>
-<h2>Delete Playlist</h2>
-<form method="POST" action="/playlists/delete">
-    <label for="id">Playlist ID:</label>
-    <input type="number" id="id" name="id" required>
-    <button type="submit">Delete</button>
-</form>
-<h2>Remove Song from Playlist</h2>
-<form method="POST" action="/playlists/remove_song">
-    <label for="playlist_id">Playlist ID:</label>
-    <input type="number" id="playlist_id" name="playlist_id" required>
-    <label for="song_id">Song ID:</label>
-    <input type="number" id="song_id" name="song_id" required>
-    <button type="submit">Remove Song</button>
-</form>
+<div class="content">
+    <h1>Playlists</h1>
+
+    <!-- Tabla de Playlists -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Songs</th>
+                <th>Users</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for playlist_id, playlist in playlists.items() %}
+            <tr>
+                <td>{{ playlist_id }}</td>
+                <td>{{ playlist.name }}</td>
+                <td>
+                    {% if playlist.songs %}
+                        <ul>
+                            {% for song in playlist.songs %}
+                            <li>{{ song.name }} (ID: {{ song.id }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <em>No songs in this playlist.</em>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if playlist.users %}
+                        <ul>
+                            {% for user in playlist.users %}
+                            <li>{{ user.name }} (ID: {{ user.id }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <em>No users in this playlist.</em>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Formulario para Agregar Playlist -->
+    <h2 class="section-title">Add Playlist</h2>
+    <form method="POST" action="/playlists/add">
+        <label for="name">Nombre de la Playlist:</label>
+        <input type="text" name="name" id="name" placeholder="Ejemplo: Rock Classics" required>
+
+        <label for="songs">Selecciona canciones:</label>
+        <input type="text" name="songs" id="songs" required placeholder="Canciones separadas por coma">
+
+        <button type="submit">Agregar Playlist</button>
+    </form>
+
+    <!-- Formulario para Eliminar Playlist -->
+    <h2 class="section-title">Delete Playlist</h2>
+    <form method="POST" action="/playlists/delete">
+        <label for="nombre_playlist">Playlist Name:</label>
+        <input type="text" id="nombre_playlist" name="nombre_playlist" required>
+        <button type="submit">Delete</button>
+    </form>
+
+    <!-- Formulario para Eliminar Canción -->
+    <h2 class="section-title">Remove Song from Playlist</h2>
+    <form method="POST" action="/playlists/remove_song">
+        <label for="playlist_id">Playlist ID:</label>
+        <input type="number" id="playlist_id" name="playlist_id" required>
+
+        <label for="song_id">Song ID:</label>
+        <input type="number" id="song_id" name="song_id" required>
+
+        <button type="submit">Remove Song</button>
+    </form>
+
+    <!-- Formulario para Eliminar Usuario -->
+    <h2 class="section-title">Remove User from Playlist</h2>
+    <form method="POST" action="/playlists/remove_user">
+        <label for="playlist_id">Playlist ID:</label>
+        <input type="number" id="playlist_id" name="playlist_id" required>
+
+        <label for="user_id">User ID:</label>
+        <input type="number" id="user_id" name="user_id" required>
+
+        <button type="submit">Remove User</button>
+    </form>
+
+    <!-- Formulario para Agregar Usuario -->
+    <h2 class="section-title">Add User to Playlist</h2>
+    <form method="POST" action="/playlists/add_user">
+        <label for="playlist_id">Playlist ID:</label>
+        <input type="number" id="playlist_id" name="playlist_id" required>
+
+        <label for="user_id">User ID:</label>
+        <input type="number" id="user_id" name="user_id" required>
+
+        <button type="submit">Add User</button>
+    </form>
+</div>
 {% endblock %}

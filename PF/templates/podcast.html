@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Podcast{% endblock %}
+
+{% block content %}
+<div class="content">
+    <h1>Podcasts</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Duration</th>
+                <th>Reproductions</th>
+                <th>Release Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for podcast in podcasts %}
+            <tr>
+                <td>{{ podcast[0] }}</td> <!-- ID del podcast -->
+                <td>{{ podcast[1] }}</td> <!-- Nombre del podcast -->
+                <td>{{ podcast[2] }}</td> <!-- Duración -->
+                <td>{{ podcast[3] }}</td> <!-- Reproducciones -->
+                <td>{{ podcast[4] }}</td> <!-- Fecha de salida -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Create Podcast</h2>
+    <form method="POST" action="/podcast/create">
+        <label for="nombre_podcast">Podcast Name:</label>
+        <input type="text" id="nombre_podcast" name="nombre_podcast" required>
+
+        <label for="duracion">Duration (HH:MM:SS):</label>
+        <input type="text" id="duracion" name="duracion" required placeholder="00:00:00">
+
+        <label for="fecha_salida">Release Date:</label>
+        <input type="date" id="fecha_salida" name="fecha_salida" required>
+
+        <label for="reproducciones">Reproductions:</label>
+        <input type="number" id="reproducciones" name="reproducciones" min="0" value="0">
+
+        <button type="submit">Create Podcast</button>
+    </form>
+
+    <h2>Delete Podcast</h2>
+    <form method="POST" action="/podcast/delete">
+        <label for="id_podcast">Podcast ID:</label>
+        <input type="number" id="id_podcast" name="id_podcast" required>
+
+        <button type="submit">Delete Podcast</button>
+    </form>
+
+
+    <h2>Update Podcast</h2>
+    <form method="POST" action="/podcast/update">
+        <label for="id_podcast">Podcast ID:</label>
+        <input type="number" id="id_podcast" name="id_podcast" required>
+
+        <label for="nombre_podcast">Podcast Name:</label>
+        <input type="text" id="nombre_podcast" name="nombre_podcast" required>
+
+        <label for="duracion">Duration (HH:MM:SS):</label>
+        <input type="text" id="duracion" name="duracion" required placeholder="00:00:00">
+
+        <label for="fecha_salida">Release Date:</label>
+        <input type="date" id="fecha_salida" name="fecha_salida" required>
+
+        <label for="reproducciones">Reproductions:</label>
+        <input type="number" id="reproducciones" name="reproducciones" min="0">
+
+        <button type="submit">Update Podcast</button>
+    </form>
+</div>
+{% endblock %}
