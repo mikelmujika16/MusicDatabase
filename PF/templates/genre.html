@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Genres{% endblock %}
+{% block title %}Generos{% endblock %}
 
 {% block content %}
 <div class="content">
-    <h1>Genres</h1>
+    <h1>Generos</h1>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
+                <th>Nombre</th>
             </tr>
         </thead>
         <tbody>
@@ -22,31 +22,32 @@
         </tbody>
     </table>
 
-    <h2>Add Genre</h2>
+    <h2 class="section-title">Añadir Genero</h2>
     <form method="POST" action="/genre/add">
-        <label for="nombre_genero">Name:</label>
+        <label for="nombre_genero">Nombre:</label>
         <input type="text" id="nombre_genero" name="nombre_genero" required>
         
-        <button type="submit">Add Genre</button>
+        <button type="submit">Añadir Genero</button>
     </form>
 
-    <h2>Update Genre</h2>
-    <form method="POST" action="/genre/update">
-        <label for="id_genero">ID:</label>
-        <input type="number" id="id_genero" name="id_genero" required>
-        
-        <label for="nombre_genero">New Name:</label>
-        <input type="text" id="nombre_genero" name="nombre_genero">
-        
-        <button type="submit">Update Genre</button>
-    </form>
-
-    <h2>Delete Genre</h2>
+    
+    <h2 class="section-title">Borrar Genero</h2>
     <form method="POST" action="/genre/delete">
         <label for="id_genero">ID:</label>
         <input type="number" id="id_genero" name="id_genero" required>
         
-        <button type="submit">Delete Genre</button>
+        <button type="submit">Borrar Genero</button>
+    </form>
+    
+    <h2 class="section-title">Actualizar Genero</h2>
+    <form method="POST" action="/genre/update">
+        <label for="id_genero">ID:</label>
+        <input type="number" id="id_genero" name="id_genero" required>
+        
+        <label for="nombre_genero">Nuevo Nombre:</label>
+        <input type="text" id="nombre_genero" name="nombre_genero">
+        
+        <button type="submit">Actualizar</button>
     </form>
 </div>
 {% endblock %}

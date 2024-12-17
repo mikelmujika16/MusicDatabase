@@ -7,7 +7,7 @@ app = Flask(__name__)
 conn = psycopg2.connect(
     dbname="music_db",
     user="postgres",
-    password="admin",
+    password="usuario",
     host="localhost"
 )
 cursor = conn.cursor()
@@ -104,10 +104,12 @@ def users():
 @app.route('/users/add', methods=['POST'])
 def add_user():
     nombre = request.form['name']
+    apellido = request.form['last_name']
+    nickname = request.form['nickname']
     email = request.form['email']
     cursor.execute(
         "INSERT INTO Usuarios (nombre, apellido, nickname, email) VALUES (%s, %s, %s, %s)",
-        (nombre, "Apellido", "nickname", email)
+        (nombre, apellido, nickname, email)
     )
     conn.commit()
     return redirect(url_for('users'))
@@ -119,7 +121,7 @@ def delete_user():
     conn.commit()
     return redirect(url_for('users'))
 
-@app.route('/usuarios/update', methods=['POST'])
+@app.route('/users/update', methods=['POST'])
 def update_user():
     # Obtener datos del formulario
     user_id = request.form['id_usuario']
@@ -128,7 +130,7 @@ def update_user():
     nickname = request.form.get('nickname')
     email = request.form.get('email')
 
-    # Actualizar el usuario en la base de datos (solo los campos proporcionados)
+    # Construir la consulta SQL para actualizar solo los campos que se han modificado
     query = "UPDATE Usuarios SET "
     values = []
     if nombre:
@@ -172,15 +174,31 @@ def songs():
     # Obtener todas las canciones junto con sus valoraciones (si existen), ordenadas por el ID de la canción
     cursor.execute("""
         SELECT c.id_cancion, c.nombre_cancion, c.duracion, c.ano_salida, c.n_reproducciones, 
-               AVG(v.puntuacion) AS promedio_puntuacion
+               AVG(v.puntuacion) AS promedio_puntuacion,
+               -- Obtener los géneros asociados a la canción
+               array_agg(g.nombre_genero) AS generos,
+               -- Obtener los autores asociados a la canción
+               array_agg(a.nombre_autor) AS autores
         FROM Canciones c
         LEFT JOIN Valora v ON c.id_cancion = v.id_cancion
+        LEFT JOIN Cancion_Generos cg ON c.id_cancion = cg.id_cancion
+        LEFT JOIN Generos g ON cg.id_genero = g.id_genero
+        LEFT JOIN Canciones_Autores ca ON c.id_cancion = ca.id_cancion
+        LEFT JOIN Autores a ON ca.id_autor = a.id_autor
         GROUP BY c.id_cancion
         ORDER BY c.id_cancion
     """)
     canciones = cursor.fetchall()
-    return render_template('songs.html', canciones=canciones)
 
+    # Obtener todos los géneros disponibles
+    cursor.execute("SELECT * FROM Generos")
+    generos = cursor.fetchall()
+
+    # Obtener todos los autores disponibles
+    cursor.execute("SELECT * FROM Autores")
+    autores = cursor.fetchall()
+
+    return render_template('songs.html', canciones=canciones, generos=generos, autores=autores)
 
 @app.route('/songs/create', methods=['POST'])
 def create_song():
@@ -268,6 +286,38 @@ def valorar_cancion():
 
     conn.commit()
     return redirect(url_for('songs'))
+
+@app.route('/songs/add_genre_songs', methods=['POST'])
+def add_genre_songs():
+    # Obtener los datos del formulario
+    id_cancion = request.form['id_cancion']
+    id_genero = request.form['id_genero']
+
+    # Insertar el género en la tabla de relación
+    cursor.execute("""
+        INSERT INTO Cancion_Generos (id_cancion, id_genero)
+        VALUES (%s, %s)
+    """, (id_cancion, id_genero))
+
+    conn.commit()
+
+    return redirect(url_for('songs'))
+
+@app.route('/songs/add_author_songs', methods=['POST'])
+def add_author_songs():
+    # Obtener los datos del formulario
+    id_cancion = request.form['id_cancion']
+    id_autor = request.form['id_autor']
+
+    # Insertar el autor en la tabla de relación
+    cursor.execute("""
+        INSERT INTO Canciones_Autores (id_cancion, id_autor)
+        VALUES (%s, %s)
+    """, (id_cancion, id_autor))
+
+    conn.commit()
+
+    return redirect(url_for('songs'))
 # ---------------------- Rutas de Podcasts ----------------------
 @app.route('/podcast', methods=['GET'])
 def podcasts_page():
@@ -307,6 +357,14 @@ def update_podcast():
     duracion = request.form['duracion']
     fecha_salida = request.form['fecha_salida']
     reproducciones = request.form['reproducciones']
+
+    # Recuperar el valor actual de 'reproducciones' para no modificarlo si no se proporciona un nuevo valor
+    cursor.execute("SELECT reproducciones FROM Podcast WHERE id_podcast = %s", (id_podcast,))
+    current_reproducciones = cursor.fetchone()[0]
+
+    # Si 'reproducciones' no se ha modificado, mantiene el valor actual
+    if reproducciones == "":
+        reproducciones = current_reproducciones  # Mantener el valor actual de reproducciones
 
     cursor.execute("""
         UPDATE Podcast
@@ -479,6 +537,54 @@ def del_playlist():
 
     print(f"Resultado: {message}")  # Verifica el mensaje resultante
     return redirect(url_for('playlists_page'))
+
+@app.route('/playlists/update', methods=['POST'])
+def update_playlist():
+    # Obtener los datos del formulario
+    playlist_id = request.form['playlist_id']
+    new_name = request.form['new_name']
+    new_songs_input = request.form['new_songs']
+    
+    # Dividir las canciones por coma (', ')
+    new_songs = [song.strip() for song in new_songs_input.split(',')]
+
+    try:
+        # Paso 1: Actualizar el nombre de la playlist
+        cursor.execute(
+            "UPDATE Playlists SET nombre_playlist = %s WHERE id_playlist = %s",
+            (new_name, playlist_id)
+        )
+        conn.commit()
+
+        # Paso 2: Eliminar las canciones actuales de la playlist
+        cursor.execute("DELETE FROM Playlist_Cancion WHERE id_playlist = %s", (playlist_id,))
+        conn.commit()
+
+        # Paso 3: Agregar las nuevas canciones a la playlist
+        for song_name in new_songs:
+            cursor.execute(
+                "SELECT id_cancion FROM Canciones WHERE nombre_cancion = %s",
+                (song_name,)
+            )
+            song_row = cursor.fetchone()
+            if song_row:
+                song_id = song_row[0]
+                cursor.execute(
+                    "INSERT INTO Playlist_Cancion (id_playlist, id_cancion) VALUES (%s, %s)",
+                    (playlist_id, song_id)
+                )
+            else:
+                print(f"Song '{song_name}' not found in the database.")
+
+        conn.commit()
+
+        return redirect(url_for('playlists_page'))
+
+    except Exception as e:
+        # En caso de error
+        conn.rollback()  # Hacer rollback si algo falla
+        print(f"Error al actualizar la playlist: {e}")
+        return redirect(url_for('playlists_page', message="Hubo un error al actualizar la playlist."))
     
 @app.route('/playlists/remove_song', methods=['POST'])
 def remove_song_from_playlist():
@@ -653,7 +759,7 @@ def add_song_to_album():
         """, (id_album, song[0]))
         conn.commit()
     else:
-        flash("Song not found", "error")
+        print("Song not found", "error")
 
     return redirect(url_for('albums'))
     
@@ -674,7 +780,7 @@ def add_genre_to_album():
         """, (id_album, genero[0]))
         conn.commit()
     else:
-        flash("Genre not found", "error")
+        print("Genre not found", "error")
 
     return redirect(url_for('albums'))
 # ---------------------- Rutas de Autores ----------------------
@@ -748,34 +854,37 @@ def grupos():
     grupos = cursor.fetchall()
     return render_template('group.html', grupos=grupos)
 
-@app.route('/grupos/add_author', methods=['POST'])
-def add_author_to_group():
-    id_autor = request.form['id_autor']
+@app.route('/grupos/add_authors', methods=['POST'])
+def add_authors_to_group():
+    id_autores_raw = request.form['id_autores']  # IDs separados por comas
+    nombre_grupo = request.form['nombre_grupo']
 
-    # Obtener el nombre del autor asociado a id_autor
-    cursor.execute("SELECT nombre_autor FROM Autores WHERE id_autor = %s", (id_autor,))
-    autor = cursor.fetchone()
+    # Convertir los IDs en una lista y eliminar espacios
+    id_autores = [int(id.strip()) for id in id_autores_raw.split(',') if id.strip().isdigit()]
 
-    if autor:
-        nombre_grupo = autor[0]
+    # Verificar que todos los autores existan
+    cursor.execute("SELECT id_autor FROM Autores WHERE id_autor IN %s", (tuple(id_autores),))
+    existing_authors = [row[0] for row in cursor.fetchall()]
 
-        # Insertar en la tabla Grupos
+    # Insertar cada autor en el grupo
+    for id_autor in id_autores:
         cursor.execute("""
-            INSERT INTO Grupos (id_autor, nombre_grupo) 
+            INSERT INTO Grupos (id_autor, nombre_grupo)
             VALUES (%s, %s)
         """, (id_autor, nombre_grupo))
-        conn.commit()
-
+    conn.commit()
+    
     return redirect(url_for('grupos'))
 
 @app.route('/grupos/delete', methods=['POST'])
 def delete_group():
-    id_autor = request.form['id_autor']
+    nombre_grupo = request.form['nombre_grupo']
 
+    # Eliminar el grupo y todas las asociaciones de autores a ese grupo
     cursor.execute("""
         DELETE FROM Grupos
-        WHERE id_autor = %s
-    """, (id_autor,))
+        WHERE nombre_grupo = %s
+    """, (nombre_grupo,))
     conn.commit()
 
     return redirect(url_for('grupos'))
@@ -906,33 +1015,62 @@ def historial():
     canciones = cursor.fetchall()
 
     return render_template('historial.html', historiales=historiales_con_detalles, usuarios=usuarios, canciones=canciones)
+
 @app.route('/historial/add', methods=['GET', 'POST'])
 def add_historial():
     if request.method == 'POST':
         id_usuario = request.form['id_usuario']
         id_cancion = request.form['id_cancion']
 
-        # Insertar en la tabla Historial
+        # Verificar si el usuario ya tiene un historial
         cursor.execute("""
-            INSERT INTO Historial (n_reproduccion) 
-            VALUES (0) 
-            RETURNING id_historial
-        """)
-        id_historial = cursor.fetchone()[0]
+            SELECT id_historial FROM Usuarios_Historial 
+            WHERE id_usuario = %s
+        """, (id_usuario,))
+        resultado = cursor.fetchone()
 
-        # Insertar en la tabla Usuarios_Historial
-        cursor.execute("""
-            INSERT INTO Usuarios_Historial (id_usuario, id_historial) 
-            VALUES (%s, %s)
-        """, (id_usuario, id_historial))
+        if resultado:
+            # Si el historial ya existe, obtener su ID
+            id_historial = resultado[0]
+        else:
+            # Si no existe, crear un nuevo historial
+            cursor.execute("""
+                INSERT INTO Historial (n_reproduccion) 
+                VALUES (0) 
+                RETURNING id_historial
+            """)
+            id_historial = cursor.fetchone()[0]
 
-        # Insertar en la tabla Historial_Cancion
+            # Asociar el historial al usuario
+            cursor.execute("""
+                INSERT INTO Usuarios_Historial (id_usuario, id_historial) 
+                VALUES (%s, %s)
+            """, (id_usuario, id_historial))
+
+        # Verificar si la canción ya está asociada al historial
         cursor.execute("""
-            INSERT INTO Historial_Cancion (id_historial, id_cancion) 
-            VALUES (%s, %s)
+            SELECT * FROM Historial_Cancion 
+            WHERE id_historial = %s AND id_cancion = %s
         """, (id_historial, id_cancion))
+        cancion_existente = cursor.fetchone()
 
+        if not cancion_existente:
+            # Asociar la canción al historial
+            cursor.execute("""
+                INSERT INTO Historial_Cancion (id_historial, id_cancion) 
+                VALUES (%s, %s)
+            """, (id_historial, id_cancion))
+        else:
+            # Si la canción ya está asociada, solo actualizamos el contador
+            cursor.execute("""
+                UPDATE Historial 
+                SET n_reproduccion = n_reproduccion + 1 
+                WHERE id_historial = %s
+            """, (id_historial,))
+
+        # Guardar los cambios en la base de datos
         conn.commit()
+
         return redirect(url_for('historial'))
 
     # Obtener todos los usuarios y canciones para los selectores
@@ -947,13 +1085,14 @@ def add_historial():
 @app.route('/historial/increment', methods=['POST'])
 def increment_reproductions():
     id_historial = request.form['id_historial']
+    n_reproduccion = request.form['n_reproduccion']
 
-    # Incrementar el número de reproducciones en 1
+    # Incrementar el número de reproducciones en el valor introducido
     cursor.execute("""
         UPDATE Historial
-        SET n_reproduccion = n_reproduccion + 1
+        SET n_reproduccion = n_reproduccion + %s
         WHERE id_historial = %s
-    """, (id_historial,))
+    """, (n_reproduccion, id_historial))
     conn.commit()
 
     return redirect(url_for('historial'))
@@ -971,12 +1110,58 @@ def delete_historial():
 #---------------------- Rutas de Discográficas ----------------------
 @app.route('/discografica')
 def discografica():
+    # Obtener todas las discográficas
     cursor.execute("""
-        SELECT id_discografia, nombre_discografica, ubicacion
-        FROM Discograficas
+        SELECT id_discografia, nombre_discografica, ubicacion FROM Discograficas
     """)
     discograficas = cursor.fetchall()
-    return render_template('discografica.html', discograficas=discograficas)
+
+    # Obtener todos los álbumes
+    cursor.execute("""
+        SELECT id_album, nombre_album FROM Albumes
+    """)
+    albums = cursor.fetchall()
+
+    # Obtener todos los autores
+    cursor.execute("""
+        SELECT id_autor, nombre_autor FROM Autores
+    """)
+    autores = cursor.fetchall()
+
+    # Obtener los álbumes y autores asociados a cada discográfica
+    discografica_info = []
+    for discografica in discograficas:
+        id_discografia = discografica[0]
+        
+        # Obtener los álbumes asociados a la discográfica
+        cursor.execute("""
+            SELECT a.id_album, a.nombre_album FROM Albumes a
+            JOIN Albumes_Discografias_Autores ad ON a.id_album = ad.id_album
+            WHERE ad.id_discografia = %s
+        """, (id_discografia,))
+        albums_for_discografica = cursor.fetchall()
+
+        # Obtener los autores asociados a la discográfica
+        cursor.execute("""
+            SELECT aut.id_autor, aut.nombre_autor FROM Autores aut
+            JOIN Albumes_Discografias_Autores ad ON aut.id_autor = ad.id_autor
+            WHERE ad.id_discografia = %s
+        """, (id_discografia,))
+        autores_for_discografica = cursor.fetchall()
+
+        discografica_info.append({
+            'discografica': discografica,
+            'albums': albums_for_discografica,
+            'autores': autores_for_discografica
+        })
+
+    # Pasar todos los datos a la plantilla
+    return render_template('discografica.html', 
+                           discograficas=discograficas, 
+                           albums=albums, 
+                           autores=autores,
+                           discografica_info=discografica_info)
+
 
 @app.route('/discografica/add', methods=['POST'])
 def add_discografica():
@@ -1011,6 +1196,51 @@ def delete_discografica():
     id_discografia = request.form['id_discografia']
 
     cursor.execute("DELETE FROM Discograficas WHERE id_discografia = %s", (id_discografia,))
+    conn.commit()
+
+    return redirect(url_for('discografica'))
+
+@app.route('/discografica/add_album', methods=['POST'])
+def add_album():
+    id_discografia = request.form['id_discografia']
+    id_album = request.form['id_album']
+    id_autor = request.form['id_autor']
+    fecha_publicacion = request.form['fecha_publicacion']
+
+
+    # Insertar el álbum con el autor y la discográfica en la tabla intermedia
+    cursor.execute("""
+        INSERT INTO Albumes_Discografias_Autores (id_album, id_autor, id_discografia, fecha_publicacion)
+        VALUES (%s, %s, %s, %s)
+    """, (id_album, id_autor, id_discografia, fecha_publicacion))
+    conn.commit()
+
+    return redirect(url_for('discografica'))
+
+@app.route('/discografica/remove_album', methods=['POST'])
+def remove_album():
+    id_discografia = request.form['id_discografia']
+    id_album = request.form['id_album']
+
+    # Eliminar la relación entre el álbum y la discográfica
+    cursor.execute("""
+        DELETE FROM Albumes_Discografias_Autores
+        WHERE id_discografia = %s AND id_album = %s
+    """, (id_discografia, id_album))
+    conn.commit()
+
+    return redirect(url_for('discografica'))
+
+@app.route('/discografica/remove_author', methods=['POST'])
+def remove_author():
+    id_discografia = request.form['id_discografia']
+    id_autor = request.form['id_autor']
+
+    # Eliminar la relación entre el autor y la discográfica
+    cursor.execute("""
+        DELETE FROM Albumes_Discografias_Autores
+        WHERE id_discografia = %s AND id_autor = %s
+    """, (id_discografia, id_autor))
     conn.commit()
 
     return redirect(url_for('discografica'))

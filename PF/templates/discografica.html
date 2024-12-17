@@ -1,60 +1,146 @@
 {% extends "base.html" %}
 
-{% block title %}Discograficas{% endblock %}
+{% block title %}Discográficas{% endblock %}
 
 {% block content %}
 <div class="content">
-    <h1>Discograficas</h1>
+    <h1>Discográficas</h1>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Location</th>
+                <th>Discográfica</th>
+                <th>Ubicación</th>
+                <th>Álbumes</th>
+                <th>Autores</th>
             </tr>
         </thead>
         <tbody>
-            {% for discografica in discograficas %}
+            {% for discografica in discografica_info %}
             <tr>
-                <td>{{ discografica[0] }}</td>
-                <td>{{ discografica[1] }}</td>
-                <td>{{ discografica[2] }}</td>
+                <td>{{ discografica['discografica'][0] }}</td>
+                <td>{{ discografica['discografica'][1] }}</td>
+                <td>{{ discografica['discografica'][2] }}</td>
+                <td>
+                    {% for album in discografica['albums'] %}
+                        {{ album[1] }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for autor in discografica['autores'] %}
+                        {{ autor[1] }}<br>
+                    {% endfor %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <h2>Add Discografica</h2>
+    <!-- Formulario para añadir Discográfica -->
+    <h2 class="section-title">Añadir Discográfica</h2>
     <form method="POST" action="/discografica/add">
-        <label for="nombre_discografica">Name:</label>
+        <label for="nombre_discografica">Nombre:</label>
         <input type="text" id="nombre_discografica" name="nombre_discografica" required>
         
-        <label for="ubicacion">Location:</label>
+        <label for="ubicacion">Ubicacion:</label>
         <input type="text" id="ubicacion" name="ubicacion" required>
         
-        <button type="submit">Add Discografica</button>
+        <button type="submit">Añadir Discográfica</button>
     </form>
-
-    <h2>Update Discografica</h2>
+    
+    <!-- Formulario para actualizar Discográfica -->
+    <h2 class="section-title">Actualizar Discográfica</h2>
     <form method="POST" action="/discografica/update">
         <label for="id_discografia">ID:</label>
         <input type="number" id="id_discografia" name="id_discografia" required>
         
-        <label for="nombre_discografica">New Name:</label>
+        <label for="nombre_discografica">Nuevo Nombre:</label>
         <input type="text" id="nombre_discografica" name="nombre_discografica">
         
-        <label for="ubicacion">New Location:</label>
+        <label for="ubicacion">Nueva Ubicacion:</label>
         <input type="text" id="ubicacion" name="ubicacion">
         
-        <button type="submit">Update Discografica</button>
+        <button type="submit">Actualizar Discográfica</button>
     </form>
-
-    <h2>Delete Discografica</h2>
+    
+    <!-- Formulario para eliminar Discográfica -->
+    <h2 class="section-title">Borrar Discográfica</h2>
     <form method="POST" action="/discografica/delete">
         <label for="id_discografia">ID:</label>
         <input type="number" id="id_discografia" name="id_discografia" required>
         
-        <button type="submit">Delete Discografica</button>
+        <button type="submit">Borrar Discográfica</button>
     </form>
+
+    <!-- Formulario para agregar Álbum o Autor a Discográfica -->
+    <h2 class="section-title">Agregar Álbum o Autor a Discográfica</h2>
+    <form method="POST" action="/discografica/add_album">
+        <label for="id_discografia">Discográfica:</label>
+        <select name="id_discografia" required>
+            {% for discografica in discograficas %}
+                <option value="{{ discografica[0] }}">{{ discografica[1] }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="id_album">Álbum:</label>
+        <select name="id_album" required>
+            {% for album in albums %}
+                <option value="{{ album[0] }}">{{ album[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="id_autor">Autor:</label>
+        <select name="id_autor" required>
+            {% for autor in autores %}
+                <option value="{{ autor[0] }}">{{ autor[1] }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="fecha_publicacion">Fecha de publicación:</label>
+        <input type="date" name="fecha_publicacion" required>
+    
+        <button type="submit">Agregar Álbum y Autor</button>
+    </form>
+
+    <!-- Formulario para eliminar Álbum -->
+    <h3 class="section-title">Eliminar Álbum</h3>
+    <form method="POST" action="/discografica/remove_album">
+        <label for="id_discografia">Discográfica:</label>
+        <select name="id_discografia" required>
+            {% for discografica in discograficas %}
+                <option value="{{ discografica[0] }}">{{ discografica[1] }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="id_album">Álbum:</label>
+        <select name="id_album" required>
+            {% for album in albums %}
+                <option value="{{ album[0] }}">{{ album[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Eliminar Álbum</button>
+    </form>
+
+    <!-- Formulario para eliminar Autor -->
+    <h3 class="section-title">Eliminar Autor</h3>
+    <form method="POST" action="/discografica/remove_author">
+        <label for="id_discografia">Discográfica:</label>
+        <select name="id_discografia" required>
+            {% for discografica in discograficas %}
+                <option value="{{ discografica[0] }}">{{ discografica[1] }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="id_autor">Autor:</label>
+        <select name="id_autor" required>
+            {% for autor in autores %}
+                <option value="{{ autor[0] }}">{{ autor[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Eliminar Autor</button>
+    </form>
+
 </div>
 {% endblock %}

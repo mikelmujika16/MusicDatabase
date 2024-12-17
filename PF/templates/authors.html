@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Authors{% endblock %}
+{% block title %}Autores{% endblock %}
 
 {% block content %}
 <div class="content">
-    <h1>Authors</h1>
+    <h1>Autores</h1>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Discography</th>
+                <th>Nombre</th>
+                <th>Discografia/Programas</th>
             </tr>
         </thead>
         <tbody>
@@ -24,63 +24,65 @@
         </tbody>
     </table>
 
-    <h2>Add Author</h2>
+    <h2 class="section-title">Añador Autor</h2>
     <form method="POST" action="/authors/add">
-        <label for="nombre_autor">Author Name:</label>
+        <label for="nombre_autor">Nombre del autor:</label>
         <input type="text" id="nombre_autor" name="nombre_autor" required>
         
-        <label for="discografia">Discography (Optional):</label>
+        <label for="discografia">Discografia (opcional):</label>
         <textarea id="discografia" name="discografia"></textarea>
         
-        <button type="submit">Add Author</button>
+        <button type="submit">Añadir Autor</button>
     </form>
 
-    <h2>Delete Author</h2>
+    <h2 class="section-title">Borrar Autor</h2>
     <form method="POST" action="/authors/delete">
-        <label for="id_autor">Author ID:</label>
+        <label for="id_autor">Autor ID:</label>
         <input type="number" id="id_autor" name="id_autor" required>
         
-        <button type="submit">Delete Author</button>
+        <button type="submit">Borrar Autor</button>
     </form>
 
-    <h2>Update Author</h2>
+    <h2 class="section-title">Actualizar Autor</h2>
     <form method="POST" action="/authors/update">
-        <label for="id_autor">Author ID:</label>
+        <label for="id_autor">Autor ID:</label>
         <input type="number" id="id_autor" name="id_autor" required>
         
-        <label for="nombre_autor">New Author Name (Optional):</label>
+        <label for="nombre_autor">Nuevo nombre del autor (Opcional):</label>
         <input type="text" id="nombre_autor" name="nombre_autor">
         
-        <label for="discografia">New Discography (Optional):</label>
+        <label for="discografia">Nueva Discografia (Opcional):</label>
         <textarea id="discografia" name="discografia"></textarea>
         
-        <button type="submit">Update Author</button>
+        <button type="submit">Actualizar Autor</button>
     </form>
 
-    
+        
+    <h2 class="section-title">Añadir autores a grupos</h2>
+    <form method="POST" action="/grupos/add_authors">
+        <label for="id_autores">Autor IDs (separado por comas):</label>
+        <input type="text" id="id_autores" name="id_autores" placeholder="e.g., 1, 2, 3" required>
 
-    <h2>Add Author to Group</h2>
-    <form method="POST" action="/grupos/add_author">
-        <label for="id_autor">Author ID:</label>
-        <input type="number" id="id_autor" name="id_autor" required>
+        <label for="nombre_grupo">Nombre del grupo:</label>
+        <input type="text" id="nombre_grupo" name="nombre_grupo" required>
 
-        <button type="submit">Add Author to Group</button>
+        <button type="submit">Añadir autor a grupo</button>
     </form>
 
-    <h2>Add Author to Artist</h2>
+    <h2 class="section-title">Añadir Autor a Artista</h2>
     <form method="POST" action="/artistas/add_author">
-        <label for="id_autor">Author ID:</label>
+        <label for="id_autor">Autor ID:</label>
         <input type="number" id="id_autor" name="id_autor" required>
 
-        <button type="submit">Add Author to Artist</button>
+        <button type="submit">Añadir Autor a Artista</button>
     </form>
 
-    <h2>Add Author to Host</h2>
+    <h2 class="section-title">Añadir Autor a Host</h2>
     <form method="POST" action="/hosts/add_author">
-        <label for="id_autor">Author ID:</label>
+        <label for="id_autor">Autor ID:</label>
         <input type="number" id="id_autor" name="id_autor" required>
 
-        <button type="submit">Add Author to Host</button>
+        <button type="submit">Añadir Autor a Host</button>
     </form>
 
 

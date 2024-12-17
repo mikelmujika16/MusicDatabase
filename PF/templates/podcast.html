@@ -28,7 +28,7 @@
         </tbody>
     </table>
 
-    <h2>Create Podcast</h2>
+    <h2 class="section-title">Añadir Podcast</h2>
     <form method="POST" action="/podcast/create">
         <label for="nombre_podcast">Nombre del Podcast:</label>
         <input type="text" id="nombre_podcast" name="nombre_podcast" required>
@@ -42,10 +42,10 @@
         <label for="reproducciones">Reproducciones:</label>
         <input type="number" id="reproducciones" name="reproducciones" min="0" value="0">
 
-        <button type="submit">Crear Podcast</button>
+        <button type="submit">Añadir Podcast</button>
     </form>
 
-    <h2>Eliminar Podcast</h2>
+    <h2 class="section-title">Eliminar Podcast</h2>
     <form method="POST" action="/podcast/delete">
         <label for="id_podcast">ID del Podcast:</label>
         <input type="number" id="id_podcast" name="id_podcast" required>
@@ -54,7 +54,7 @@
     </form>
 
 
-    <h2>Actualizar Podcast</h2>
+    <h2 class="section-title">Actualizar Podcast</h2>
     <form method="POST" action="/podcast/update">
         <label for="id_podcast">Podcast ID:</label>
         <input type="number" id="id_podcast" name="id_podcast" required>

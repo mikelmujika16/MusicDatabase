@@ -8,8 +8,8 @@
   <table>
       <thead>
           <tr>
-              <th>Author ID</th>
-              <th>Host Name</th>
+              <th>Autor ID</th>
+              <th>Nombre del Host</th>
           </tr>
       </thead>
       <tbody>
@@ -22,12 +22,12 @@
       </tbody>
   </table>
 
-  <h2>Delete Host</h2>
+  <h2 class="section-title">Borrar Host</h2>
   <form method="POST" action="/hosts/delete">
-      <label for="id_autor">Author ID:</label>
+      <label for="id_autor">Autor ID:</label>
       <input type="number" id="id_autor" name="id_autor" required>
       
-      <button type="submit">Delete Host</button>
+      <button type="submit">Borrar Host</button>
   </form>
 </div>
 {% endblock %}

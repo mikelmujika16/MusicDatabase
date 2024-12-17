@@ -9,12 +9,12 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Duration</th>
-                <th>Plays</th>
-                <th>Release Year</th>
-                <th>Genres</th>
-                <th>Songs</th>
+                <th>Nombre</th>
+                <th>Duracion</th>
+                <th>Reproducciones</th>
+                <th>Año de salida</th>
+                <th>Generos</th>
+                <th>Canciones</th>
             </tr>
         </thead>
         <tbody>
@@ -40,86 +40,87 @@
         </tbody>
     </table>
 
-    <h2>Create Album</h2>
+    <h2 class="section-title">Añadir Album</h2>
     <form method="POST" action="/albums/create">
-        <label for="nombre_album">Album Name:</label>
+        <label for="nombre_album">Nombre del Album:</label>
         <input type="text" id="nombre_album" name="nombre_album" required>
 
-        <label for="duracion">Duration:</label>
+        <label for="duracion">Duracion:</label>
         <input type="text" id="duracion" name="duracion" required placeholder="00:00:00">
 
-        <label for="reproduccion">Plays:</label>
+        <label for="reproduccion">Reproducciones:</label>
         <input type="number" id="reproduccion" name="reproduccion" value="0" required>
 
-        <label for="ano_salida">Release Year:</label>
+        <label for="ano_salida">Año de salida:</label>
         <input type="number" id="ano_salida" name="ano_salida" required>
 
-        <button type="submit">Create Album</button>
+        <button type="submit">Añadir Album</button>
     </form>
 
-    <h2>Delete Album</h2>
+    <h2 class="section-title">Borrar Album</h2>
     <form method="POST" action="/albums/delete">
         <label for="id_album">Album ID:</label>
         <input type="number" id="id_album" name="id_album" required>
 
-        <button type="submit">Delete Album</button>
+        <button type="submit">Borrar Album</button>
     </form>
 
-    <h2>Update Album</h2>
+    <h2 class="section-title">Actualizar Album</h2>
     <form method="POST" action="/albums/update">
         <label for="id_album">Album ID:</label>
         <input type="number" id="id_album" name="id_album" required>
 
-        <label for="nombre_album">New Album Name:</label>
+        <label for="nombre_album">Nuevo nombre del Album:</label>
         <input type="text" id="nombre_album" name="nombre_album">
 
-        <label for="duracion">New Duration:</label>
+        <label for="duracion">Nueva Duracion:</label>
         <input type="text" id="duracion" name="duracion" placeholder="00:00:00">
 
-        <label for="reproduccion">New Plays:</label>
+        <label for="reproduccion">Nuevo numero de reproducciones:</label>
         <input type="number" id="reproduccion" name="reproduccion">
 
-        <label for="ano_salida">New Release Year:</label>
+        <label for="ano_salida">Nuevo año de salida:</label>
         <input type="number" id="ano_salida" name="ano_salida">
 
-        <button type="submit">Update Album</button>
+        <button type="submit">Actualizar Album</button>
     </form>
-
-    <h2>Add Song to Album</h2>
+ 
+    <h2 class="section-title">Añadir cancion al Album</h2>
     <form method="POST" action="/albums/add_song">
-        <label for="id_album">Album Name:</label>
+        <label for="id_album">Nombre del Album:</label>
         <select name="id_album" id="id_album" required>
             {% for album in albums %}
                 <option value="{{ album[0] }}">{{ album[1] }}</option>
             {% endfor %}
         </select>
 
-        <label for="nombre_cancion">Song Name:</label>
+        <label for="nombre_cancion">Nombre de la cancion:</label>
         <select name="nombre_cancion" id="nombre_cancion" required>
             {% for song in canciones %}
                 <option value="{{ song[1] }}">{{ song[1] }}</option>
             {% endfor %}
         </select>
 
-        <button type="submit">Add Song</button>
+        <button type="submit">añadir Song</button>
     </form>
-    <h2>Add Genre to Album</h2>
+
+    <h2 class="section-title">Añadir genero a un album</h2>
     <form method="POST" action="/albums/add_genre">
-        <label for="id_album">Album Name:</label>
+        <label for="id_album">Nombre del album:</label>
         <select name="id_album" id="id_album" required>
             {% for album in albums %}
                 <option value="{{ album[0] }}">{{ album[1] }}</option>
             {% endfor %}
         </select>
 
-        <label for="nombre_genero">Genre Name:</label>
+        <label for="nombre_genero">Genero:</label>
         <select name="nombre_genero" id="nombre_genero" required>
             {% for genero in generos %}
                 <option value="{{ genero[1] }}">{{ genero[1] }}</option>
             {% endfor %}
         </select>
 
-        <button type="submit">Add Genre</button>
+        <button type="submit">Añadir Genero</button>
     </form>
 </div>
 {% endblock %}

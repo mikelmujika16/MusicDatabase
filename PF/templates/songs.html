@@ -1,20 +1,21 @@
-
 {% extends "base.html" %}
 
 {% block title %}Songs{% endblock %}
 
 {% block content %}
 <div class="content">
-    <h2>Songs</h2>
-    <table >
+    <h1>Canciones</h1>
+    <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Duration</th>
-                <th>Release Year</th>
-                <th>Views</th>
-                <th>Average Rating</th>
+                <th>Nombre</th>
+                <th>Duracion</th>
+                <th>Año de salida</th>
+                <th>Visualizaciones</th>
+                <th>Rating</th>
+                <th>Géneros</th>  <!-- Columna para Géneros -->
+                <th>Autores</th>  <!-- Columna para Autores -->
             </tr>
         </thead>
         <tbody>
@@ -27,57 +28,72 @@
                 <td>{{ song[4] }}</td>
                 <td>
                     {% if song[5] %}
-                        {{ song[5]|round(2) }} <!-- Promedio de puntuación de la canción (redondeado a 2 decimales) -->
+                        {{ song[5]|round(2) }} 
                     {% else %}
                         No ratings yet
+                    {% endif %}
+                </td>
+                <td>
+                    {% if song[6] %}
+                        {{ song[6]|join(", ") }}  <!-- Mostrar géneros -->
+                    {% else %}
+                        No genres
+                    {% endif %}
+                </td>
+                <td>
+                    {% if song[7] %}
+                        {{ song[7]|join(", ") }}  <!-- Mostrar autores -->
+                    {% else %}
+                        No authors
                     {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <h2>Create Song</h2>
+
+    <h2 class="section-title">Añadir una cancion</h2>
     <form method="POST" action="/songs/create">
-        <label for="nombre_cancion">Song Name:</label>
+        <label for="nombre_cancion">Nombre de la cancion:</label>
         <input type="text" id="nombre_cancion" name="nombre_cancion" required>
 
-        <label for="duracion">Duration (HH:MM:SS):</label>
+        <label for="duracion">Duracion (HH:MM:SS):</label>
         <input type="text" id="duracion" name="duracion" required placeholder="00:00:00">
 
-        <label for="ano_salida">Release Year:</label>
+        <label for="ano_salida">Año de salida:</label>
         <input type="number" id="ano_salida" name="ano_salida" required>
 
-        <button type="submit">Create Song</button>
+        <button type="submit">Añadir cancion</button>
     </form>
 
-    <h2>Delete Song</h2>
+    <h2 class="section-title">Borrar cancion</h2>
     <form method="POST" action="/songs/delete">
-        <label for="id_cancion">Song ID:</label>
+        <label for="id_cancion">Cancion ID:</label>
         <input type="number" id="id_cancion" name="id_cancion" required>
 
-        <button type="submit">Delete Song</button>
+        <button type="submit">Borrar Cancion</button>
     </form>
 
-    <h2>Update Song</h2>
+    <h2 class="section-title">Actualizar Cancion</h2>
     <form method="POST" action="/songs/update">
-        <label for="id_cancion">Song ID:</label>
+        <label for="id_cancion">Cancion ID:</label>
         <input type="number" id="id_cancion" name="id_cancion" required>
 
-        <label for="nombre_cancion">New Song Name:</label>
+        <label for="nombre_cancion">Nuevo nombre de la cancion:</label>
         <input type="text" id="nombre_cancion" name="nombre_cancion">
 
-        <label for="duracion">New Duration (HH:MM:SS):</label>
+        <label for="duracion">Nueva Duracion (HH:MM:SS):</label>
         <input type="text" id="duracion" name="duracion" required placeholder="00:00:00">
 
-        <label for="ano_salida">New Release Year:</label>
+        <label for="ano_salida">Nuevo Año de salida:</label>
         <input type="number" id="ano_salida" name="ano_salida">
 
-        <button type="submit">Update Song</button>
+        <button type="submit">Actualizar cancion</button>
     </form>
 
-    <h2>Rate a Song</h2>
+    <h2 class="section-title">Puntuar una cancion</h2>
     <form method="POST" action="/valorar">
-        <label for="id_cancion">Select Song:</label>
+        <label for="id_cancion">Selecciona una cancion:</label>
         <select name="id_cancion" id="id_cancion" required>
             {% for cancion in canciones %}
                 <option value="{{ cancion[0] }}">{{ cancion[1] }}</option>
@@ -87,7 +103,45 @@
         <label for="puntuacion">Rating (1-5):</label>
         <input type="number" id="puntuacion" name="puntuacion" min="1" max="5" required>
 
-        <button type="submit">Submit Rating</button>
+        <button type="submit">Puntuar</button>
+    </form>
+
+    <h2 class="section-title">Añadir un género a una canción</h2>
+    <form method="POST" action="/songs/add_genre_songs">
+        <label for="id_cancion">Selecciona una canción:</label>
+        <select name="id_cancion" id="id_cancion" required>
+            {% for cancion in canciones %}
+                <option value="{{ cancion[0] }}">{{ cancion[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="id_genero">Selecciona un género:</label>
+        <select name="id_genero" id="id_genero" required>
+            {% for genero in generos %}
+                <option value="{{ genero[0] }}">{{ genero[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Añadir género</button>
+    </form>
+
+    <h2 class="section-title">Añadir un autor a una canción</h2>
+    <form method="POST" action="/songs/add_author_songs">
+        <label for="id_cancion">Selecciona una canción:</label>
+        <select name="id_cancion" id="id_cancion" required>
+            {% for cancion in canciones %}
+                <option value="{{ cancion[0] }}">{{ cancion[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="id_autor">Selecciona un autor:</label>
+        <select name="id_autor" id="id_autor" required>
+            {% for autor in autores %}
+                <option value="{{ autor[0] }}">{{ autor[1] }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Añadir autor</button>
     </form>
 </div>
 {% endblock %}

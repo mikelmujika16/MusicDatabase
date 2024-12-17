@@ -308,15 +308,17 @@ EXECUTE FUNCTION incrementar_reproducciones();
 CREATE OR REPLACE FUNCTION validar_unicidad_usuario()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF EXISTS (
-        SELECT 1 FROM Usuarios WHERE email = NEW.email OR nickname = NEW.nickname
-    ) THEN
-        RAISE EXCEPTION 'El email o nickname ya existe';
+    -- Comprobamos si hay un cambio en el email o nickname
+    IF (NEW.email IS DISTINCT FROM OLD.email OR NEW.nickname IS DISTINCT FROM OLD.nickname) THEN
+        IF EXISTS (
+            SELECT 1 FROM Usuarios WHERE email = NEW.email OR nickname = NEW.nickname
+        ) THEN
+            RAISE EXCEPTION 'El email o nickname ya existe';
+        END IF;
     END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 CREATE TRIGGER trigger_validar_unicidad_usuario
 BEFORE INSERT OR UPDATE ON Usuarios
 FOR EACH ROW
