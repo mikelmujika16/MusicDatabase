@@ -363,6 +363,39 @@ CREATE TRIGGER trigger_validar_duracion_playlist
 AFTER INSERT OR DELETE ON Playlist_Cancion
 FOR EACH ROW
 EXECUTE FUNCTION validar_duracion_playlist();
+
+-- Función para verificar que un autor solo pueda ser un grupo, artista o host
+CREATE OR REPLACE FUNCTION check_author_role() RETURNS TRIGGER AS $$
+BEGIN
+    IF (SELECT COUNT(*) FROM Grupos WHERE id_autor = NEW.id_autor) > 0 THEN
+        RAISE EXCEPTION 'El autor ya es un grupo';
+    ELSIF (SELECT COUNT(*) FROM Artista WHERE id_autor = NEW.id_autor) > 0 THEN
+        RAISE EXCEPTION 'El autor ya es un artista';
+    ELSIF (SELECT COUNT(*) FROM Hosts WHERE id_autor = NEW.id_autor) > 0 THEN
+        RAISE EXCEPTION 'El autor ya es un host';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger para la tabla Grupos
+CREATE TRIGGER check_author_role_grupo
+BEFORE INSERT ON Grupos
+FOR EACH ROW
+EXECUTE FUNCTION check_author_role();
+
+-- Trigger para la tabla Artista
+CREATE TRIGGER check_author_role_artista
+BEFORE INSERT ON Artista
+FOR EACH ROW
+EXECUTE FUNCTION check_author_role();
+
+-- Trigger para la tabla Hosts
+CREATE TRIGGER check_author_role_host
+BEFORE INSERT ON Hosts
+FOR EACH ROW
+EXECUTE FUNCTION check_author_role();
+
 -- Inserts para la tabla Usuarios
 INSERT INTO Usuarios (nombre, apellido, nickname, email) VALUES
 ('Juan', 'Perez', 'juanp', 'juan.perez@example.com'),
