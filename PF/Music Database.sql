@@ -261,7 +261,7 @@ CREATE TABLE Albumes_Discografias_Autores (
     id_autor INT NOT NULL,
     id_discografia INT NOT NULL,
     fecha_publicacion DATE NOT NULL,
-    PRIMARY KEY (id_album, id_autor, id_discografia),
+    PRIMARY KEY (id_album),
     FOREIGN KEY (id_album) REFERENCES Albumes(id_album) ON DELETE CASCADE,
     FOREIGN KEY (id_autor) REFERENCES Autores(id_autor) ON DELETE CASCADE,
     FOREIGN KEY (id_discografia) REFERENCES Discograficas(id_discografia) ON DELETE CASCADE
