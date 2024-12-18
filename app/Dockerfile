@@ -10,6 +10,9 @@ COPY requirements.txt requirements.txt
 # Instalar las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Add PostgreSQL client for debugging
+RUN apt-get update && apt-get install -y postgresql-client && apt-get clean
+
 # Copiar el resto de los archivos de la aplicación
 COPY . .
 

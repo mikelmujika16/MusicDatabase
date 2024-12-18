@@ -8,7 +8,7 @@ Este proyecto consiste en una base de datos de música utilizando PostgreSQL. La
 
 Para ver la documentación del proyecto y todas las relaciones de clases en la página web, entra aquí:
 
-``https://dbdocs.io/mikelmujika16/MusicDB``
+`https://dbdocs.io/mikelmujika16/MusicDB`
 
 ## :bar_chart: Modelo Entidad-Relación
 

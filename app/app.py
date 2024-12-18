@@ -2,14 +2,15 @@
 import psycopg2
 import os
 
-app = Flask(__name__)
+
+app = Flask(__name__)  # Create the Flask app instance
 
 # Conexión a la base de datos
 conn = psycopg2.connect(
     dbname=os.getenv('POSTGRES_DB', 'music_db'),
     user=os.getenv('POSTGRES_USER', 'postgres'),
     password=os.getenv('POSTGRES_PASSWORD', 'admin'),
-    host=os.getenv('DB_HOST', 'localhost')
+    host=os.getenv('DB_HOST', 'db')
 )
 cursor = conn.cursor()
 
