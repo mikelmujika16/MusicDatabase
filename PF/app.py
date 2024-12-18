@@ -7,7 +7,7 @@ app = Flask(__name__)
 conn = psycopg2.connect(
     dbname="music_db",
     user="postgres",
-    password="usuario",
+    password="admin",
     host="localhost"
 )
 cursor = conn.cursor()
@@ -977,23 +977,18 @@ def delete_host():
 @app.route('/historial')
 def historial():
     # Obtener todos los historiales
-    cursor.execute("SELECT * FROM Historial")
+    cursor.execute("""
+        SELECT h.id_historial, h.id_usuario, h.n_reproduccion_total, u.nombre
+        FROM Historial h
+        JOIN Usuarios u ON h.id_usuario = u.id_usuario
+    """)
     historiales = cursor.fetchall()
 
     historiales_con_detalles = []
     for historial in historiales:
-        # Obtener los usuarios asociados a este historial
-        cursor.execute("""
-            SELECT u.id_usuario, u.nombre
-            FROM Usuarios u
-            JOIN Usuarios_Historial uh ON u.id_usuario = uh.id_usuario
-            WHERE uh.id_historial = %s
-        """, (historial[0],))
-        usuarios = cursor.fetchall()
-
         # Obtener las canciones asociadas a este historial
         cursor.execute("""
-            SELECT c.id_cancion, c.nombre_cancion
+            SELECT c.id_cancion, c.nombre_cancion, hc.n_reproduccion
             FROM Canciones c
             JOIN Historial_Cancion hc ON c.id_cancion = hc.id_cancion
             WHERE hc.id_historial = %s
@@ -1002,9 +997,10 @@ def historial():
 
         historiales_con_detalles.append({
             'id_historial': historial[0],
-            'n_reproduccion': historial[1],
-            'usuarios': [{'id_usuario': u[0], 'nombre': u[1]} for u in usuarios],
-            'canciones': [{'id_cancion': c[0], 'nombre': c[1]} for c in canciones]
+            'id_usuario': historial[1],
+            'n_reproduccion_total': historial[2],
+            'nombre_usuario': historial[3],
+            'canciones': [{'id_cancion': c[0], 'nombre': c[1], 'n_reproduccion': c[2]} for c in canciones]
         })
 
     # Obtener todos los usuarios y canciones para los selectores
@@ -1016,6 +1012,7 @@ def historial():
 
     return render_template('historial.html', historiales=historiales_con_detalles, usuarios=usuarios, canciones=canciones)
 
+
 @app.route('/historial/add', methods=['GET', 'POST'])
 def add_historial():
     if request.method == 'POST':
@@ -1024,7 +1021,7 @@ def add_historial():
 
         # Verificar si el usuario ya tiene un historial
         cursor.execute("""
-            SELECT id_historial FROM Usuarios_Historial 
+            SELECT id_historial FROM Historial 
             WHERE id_usuario = %s
         """, (id_usuario,))
         resultado = cursor.fetchone()
@@ -1035,38 +1032,39 @@ def add_historial():
         else:
             # Si no existe, crear un nuevo historial
             cursor.execute("""
-                INSERT INTO Historial (n_reproduccion) 
-                VALUES (0) 
+                INSERT INTO Historial (id_usuario, n_reproduccion_total) 
+                VALUES (%s, 0) 
                 RETURNING id_historial
-            """)
+            """, (id_usuario,))
             id_historial = cursor.fetchone()[0]
-
-            # Asociar el historial al usuario
-            cursor.execute("""
-                INSERT INTO Usuarios_Historial (id_usuario, id_historial) 
-                VALUES (%s, %s)
-            """, (id_usuario, id_historial))
 
         # Verificar si la canción ya está asociada al historial
         cursor.execute("""
             SELECT * FROM Historial_Cancion 
-            WHERE id_historial = %s AND id_cancion = %s
-        """, (id_historial, id_cancion))
+            WHERE id_historial = %s AND id_usuario = %s AND id_cancion = %s
+        """, (id_historial, id_usuario, id_cancion))
         cancion_existente = cursor.fetchone()
 
         if not cancion_existente:
             # Asociar la canción al historial
             cursor.execute("""
-                INSERT INTO Historial_Cancion (id_historial, id_cancion) 
-                VALUES (%s, %s)
-            """, (id_historial, id_cancion))
+                INSERT INTO Historial_Cancion (id_historial, id_usuario, id_cancion, n_reproduccion) 
+                VALUES (%s, %s, %s, 1)
+            """, (id_historial, id_usuario, id_cancion))
         else:
             # Si la canción ya está asociada, solo actualizamos el contador
             cursor.execute("""
-                UPDATE Historial 
+                UPDATE Historial_Cancion 
                 SET n_reproduccion = n_reproduccion + 1 
-                WHERE id_historial = %s
-            """, (id_historial,))
+                WHERE id_historial = %s AND id_usuario = %s AND id_cancion = %s
+            """, (id_historial, id_usuario, id_cancion))
+
+        # Actualizar el contador total de reproducciones en el historial
+        cursor.execute("""
+            UPDATE Historial 
+            SET n_reproduccion_total = n_reproduccion_total + 1 
+            WHERE id_historial = %s AND id_usuario = %s
+        """, (id_historial, id_usuario))
 
         # Guardar los cambios en la base de datos
         conn.commit()
@@ -1085,14 +1083,23 @@ def add_historial():
 @app.route('/historial/increment', methods=['POST'])
 def increment_reproductions():
     id_historial = request.form['id_historial']
+    id_cancion = request.form['id_cancion']
     n_reproduccion = request.form['n_reproduccion']
 
     # Incrementar el número de reproducciones en el valor introducido
     cursor.execute("""
-        UPDATE Historial
+        UPDATE Historial_Cancion
         SET n_reproduccion = n_reproduccion + %s
+        WHERE id_historial = %s AND id_cancion = %s
+    """, (n_reproduccion, id_historial, id_cancion))
+
+    # Actualizar el contador total de reproducciones en el historial
+    cursor.execute("""
+        UPDATE Historial
+        SET n_reproduccion_total = n_reproduccion_total + %s
         WHERE id_historial = %s
     """, (n_reproduccion, id_historial))
+
     conn.commit()
 
     return redirect(url_for('historial'))
@@ -1106,6 +1113,8 @@ def delete_historial():
     conn.commit()
 
     return redirect(url_for('historial'))
+
+
 
 #---------------------- Rutas de Discográficas ----------------------
 @app.route('/discografica')

@@ -61,8 +61,11 @@ CREATE TABLE Canciones (
 
 -- Tabla: Historial
 CREATE TABLE Historial (
-    id_historial SERIAL PRIMARY KEY,
-    n_reproduccion INT DEFAULT 0 CHECK (n_reproduccion >= 0)
+    id_historial SERIAL,
+    id_usuario INT,
+    n_reproduccion_total INT DEFAULT 0 CHECK (n_reproduccion_total >= 0),
+    PRIMARY KEY (id_historial, id_usuario),
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
 );
 
 -- Tabla: Podcast
@@ -96,7 +99,6 @@ CREATE TABLE Autores (
     discografia TEXT
 );
 
--- Tabla: Grupo
 -- Tabla: Grupo
 CREATE TABLE Grupos (
     id_autor INTEGER,
@@ -137,14 +139,7 @@ CREATE TABLE Usuarios_Playlist (
     FOREIGN KEY (id_playlist) REFERENCES Playlists(id_playlist) ON DELETE CASCADE
 );
 
--- Tabla: Usuarios-Historial
-CREATE TABLE Usuarios_Historial (
-    id_usuario INT NOT NULL,
-    id_historial INT NOT NULL,
-    PRIMARY KEY (id_usuario, id_historial),
-    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario),
-    FOREIGN KEY (id_historial) REFERENCES Historial(id_historial) ON DELETE CASCADE
-);
+
 
 -- Tabla: Usuarios-Canciones
 CREATE TABLE Usuarios_Canciones (
@@ -186,9 +181,11 @@ CREATE TABLE Playlist_Cancion (
 -- Tabla: Historial-Cancion
 CREATE TABLE Historial_Cancion (
     id_historial INT NOT NULL,
+    id_usuario INT NOT NULL,
     id_cancion INT NOT NULL,
-    PRIMARY KEY (id_historial, id_cancion),
-    FOREIGN KEY (id_historial) REFERENCES Historial(id_historial) ON DELETE CASCADE,
+    n_reproduccion INT,
+    PRIMARY KEY (id_historial, id_usuario, id_cancion),
+    FOREIGN KEY (id_historial, id_usuario) REFERENCES Historial(id_historial, id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_cancion) REFERENCES Canciones(id_cancion) ON DELETE CASCADE
 );
 
@@ -293,7 +290,7 @@ CREATE OR REPLACE FUNCTION incrementar_reproducciones()
 RETURNS TRIGGER AS $$
 BEGIN
     UPDATE Historial
-    SET n_reproduccion = n_reproduccion + 1
+    SET n_reproduccion_total = n_reproduccion_total + 1
     WHERE id_historial = NEW.id_historial;
     RETURN NEW;
 END;
@@ -431,12 +428,12 @@ INSERT INTO Canciones (nombre_cancion, duracion, n_reproducciones, ano_salida) V
 ('Uptown Funk', '00:04:30', 14000, 2014);
 
 -- Inserts para la tabla Historial
-INSERT INTO Historial (n_reproduccion) VALUES
-(5),
-(3),
-(10),
-(7),
-(6);
+INSERT INTO Historial (id_usuario,n_reproduccion_total) VALUES
+(1,0),
+(2,0),
+(3,0),
+(4,0),
+(5,0);
 
 -- Inserts para la tabla Podcast
 INSERT INTO Podcast (nombre_podcast, duracion, reproducciones, fecha_salida) VALUES
@@ -552,13 +549,7 @@ INSERT INTO Usuarios_Playlist (id_usuario, id_playlist) VALUES
 (8, 2),  -- Laura con Playlist Pop Hits
 (10, 3); -- Lucía con Playlist Workout Beats
 
--- Inserts para la tabla Usuarios-Historial
-INSERT INTO Usuarios_Historial (id_usuario, id_historial) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5);
+
 
 -- Inserts para la tabla Usuarios-Canciones
 INSERT INTO Usuarios_Canciones (id_usuario, id_cancion) VALUES
@@ -613,12 +604,12 @@ INSERT INTO Playlist_Cancion (id_playlist, id_cancion) VALUES
 (5, 10);
 
 -- Inserts para la tabla Historial-Cancion
-INSERT INTO Historial_Cancion (id_historial, id_cancion) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5);
+INSERT INTO Historial_Cancion (id_historial, id_usuario, id_cancion, n_reproduccion) VALUES
+(1, 1, 1, 5),
+(2, 2, 2, 6),
+(3, 3, 3, 7),
+(4, 4, 4, 8),
+(5, 5, 5, 2);
 
 -- Inserts para la tabla Cancion-Albums
 INSERT INTO Cancion_Albums (id_cancion, id_album) VALUES
