@@ -1,0 +1,288 @@
+Table "Usuarios" {
+  "id_usuario" SERIAL [pk, increment]
+  "nombre" VARCHAR(100) [not null]
+  "apellido" VARCHAR(100) [not null]
+  "nickname" VARCHAR(50) [unique, not null]
+  "email" VARCHAR(150) [unique, not null]
+}
+
+Table "Playlists" {
+  "id_playlist" SERIAL [pk, increment]
+  "nombre_playlist" VARCHAR(100) [not null]
+  "duracion" TIME [not null]
+}
+
+Table "Canciones" {
+  "id_cancion" SERIAL [pk, increment]
+  "nombre_cancion" VARCHAR(150) [not null]
+  "duracion" TIME [not null]
+  "n_reproducciones" INT [default: 0]
+  "ano_salida" INT [not null]
+}
+
+Table "Historial" {
+  "id_historial" SERIAL [increment]
+  "id_usuario" INT
+  "n_reproduccion_total" INT [default: 0]
+
+  Indexes {
+    (id_historial, id_usuario) [pk]
+  }
+}
+
+Table "Podcast" {
+  "id_podcast" SERIAL [pk, increment]
+  "nombre_podcast" VARCHAR(150) [not null]
+  "duracion" TIME [not null]
+  "reproducciones" INT [default: 0]
+  "fecha_salida" DATE [not null]
+}
+
+Table "Albumes" {
+  "id_album" SERIAL [pk, increment]
+  "nombre_album" VARCHAR(150) [not null]
+  "duracion" TIME [not null]
+  "reproduccion" INT [default: 0]
+  "ano_salida" INT [not null]
+}
+
+Table "Generos" {
+  "id_genero" SERIAL [pk, increment]
+  "nombre_genero" VARCHAR(100) [not null]
+}
+
+Table "Autores" {
+  "id_autor" SERIAL [pk, increment]
+  "nombre_autor" VARCHAR(150) [not null]
+  "discografia" TEXT
+}
+
+Table "Grupos" {
+  "id_autor" INTEGER
+  "nombre_grupo" VARCHAR(150) [not null]
+
+  Indexes {
+    (id_autor, nombre_grupo) [pk]
+  }
+}
+
+Table "Artista" {
+  "id_autor" INTEGER
+  "nombre_artista" VARCHAR(150) [not null]
+
+  Indexes {
+    (id_autor, nombre_artista) [pk]
+  }
+}
+
+Table "Hosts" {
+  "id_autor" INTEGER
+  "nombre_host" VARCHAR(150) [not null]
+
+  Indexes {
+    (id_autor, nombre_host) [pk]
+  }
+}
+
+Table "Discograficas" {
+  "id_discografia" SERIAL [pk, increment]
+  "nombre_discografica" VARCHAR(150) [not null]
+  "ubicacion" TEXT
+}
+
+Table "Usuarios_Playlist" {
+  "id_usuario" INT [not null]
+  "id_playlist" INT [not null]
+
+  Indexes {
+    (id_usuario, id_playlist) [pk]
+  }
+}
+
+Table "Usuarios_Canciones" {
+  "id_usuario" INT [not null]
+  "id_cancion" INT [not null]
+
+  Indexes {
+    (id_usuario, id_cancion) [pk]
+  }
+}
+
+Table "Valora" {
+  "id_usuario" INT [not null]
+  "id_cancion" INT [not null]
+  "puntuacion" INT
+
+  Indexes {
+    (id_usuario, id_cancion) [pk]
+  }
+}
+
+Table "Usuarios_Podcast" {
+  "id_usuario" INT [not null]
+  "id_podcast" INT [not null]
+
+  Indexes {
+    (id_usuario, id_podcast) [pk]
+  }
+}
+
+Table "Playlist_Cancion" {
+  "id_playlist" INT [not null]
+  "id_cancion" INT [not null]
+
+  Indexes {
+    (id_playlist, id_cancion) [pk]
+  }
+}
+
+Table "Historial_Cancion" {
+  "id_historial" INT [not null]
+  "id_usuario" INT [not null]
+  "id_cancion" INT [not null]
+  "n_reproduccion" INT
+
+  Indexes {
+    (id_historial, id_usuario, id_cancion) [pk]
+  }
+}
+
+Table "Cancion_Albums" {
+  "id_cancion" INT [not null]
+  "id_album" INT [not null]
+
+  Indexes {
+    (id_cancion, id_album) [pk]
+  }
+}
+
+Table "Cancion_Generos" {
+  "id_cancion" INT [not null]
+  "id_genero" INT [not null]
+
+  Indexes {
+    (id_cancion, id_genero) [pk]
+  }
+}
+
+Table "Canciones_Autores" {
+  "id_cancion" INT [not null]
+  "id_autor" INT [not null]
+
+  Indexes {
+    (id_cancion, id_autor) [pk]
+  }
+}
+
+Table "Albumes_Genero" {
+  "id_album" INT [not null]
+  "id_genero" INT [not null]
+
+  Indexes {
+    (id_album, id_genero) [pk]
+  }
+}
+
+Table "Genero_Autores" {
+  "id_genero" INT [not null]
+  "id_autor" INT [not null]
+
+  Indexes {
+    (id_genero, id_autor) [pk]
+  }
+}
+
+Table "Albumes_Autor" {
+  "id_album" INT [not null]
+  "id_autor" INT [not null]
+
+  Indexes {
+    (id_album, id_autor) [pk]
+  }
+}
+
+Table "Podcast_Autores" {
+  "id_podcast" INT [not null]
+  "id_autor" INT [not null]
+
+  Indexes {
+    (id_podcast, id_autor) [pk]
+  }
+}
+
+Table "Albumes_Discografias_Autores" {
+  "id_album" INT [not null]
+  "id_autor" INT [not null]
+  "id_discografia" INT [not null]
+  "fecha_publicacion" DATE [not null]
+
+  Indexes {
+    id_album [pk]
+  }
+}
+
+Ref:"Usuarios"."id_usuario" < "Historial"."id_usuario" [delete: cascade]
+
+Ref:"Autores"."id_autor" < "Grupos"."id_autor" [delete: cascade]
+
+Ref:"Autores"."id_autor" < "Artista"."id_autor" [delete: cascade]
+
+Ref:"Autores"."id_autor" < "Hosts"."id_autor" [delete: cascade]
+
+Ref:"Usuarios"."id_usuario" < "Usuarios_Playlist"."id_usuario"
+
+Ref:"Playlists"."id_playlist" < "Usuarios_Playlist"."id_playlist" [delete: cascade]
+
+Ref:"Usuarios"."id_usuario" < "Usuarios_Canciones"."id_usuario"
+
+Ref:"Canciones"."id_cancion" < "Usuarios_Canciones"."id_cancion" [delete: cascade]
+
+Ref:"Usuarios"."id_usuario" < "Valora"."id_usuario"
+
+Ref:"Canciones"."id_cancion" < "Valora"."id_cancion" [delete: cascade]
+
+Ref:"Usuarios"."id_usuario" < "Usuarios_Podcast"."id_usuario"
+
+Ref:"Podcast"."id_podcast" < "Usuarios_Podcast"."id_podcast" [delete: cascade]
+
+Ref:"Playlists"."id_playlist" < "Playlist_Cancion"."id_playlist" [delete: cascade]
+
+Ref:"Canciones"."id_cancion" < "Playlist_Cancion"."id_cancion" [delete: cascade]
+
+Ref:"Historial".("id_historial", "id_usuario") < "Historial_Cancion".("id_historial", "id_usuario") [delete: cascade]
+
+Ref:"Canciones"."id_cancion" < "Historial_Cancion"."id_cancion" [delete: cascade]
+
+Ref:"Canciones"."id_cancion" < "Cancion_Albums"."id_cancion" [delete: cascade]
+
+Ref:"Albumes"."id_album" < "Cancion_Albums"."id_album" [delete: cascade]
+
+Ref:"Canciones"."id_cancion" < "Cancion_Generos"."id_cancion" [delete: cascade]
+
+Ref:"Generos"."id_genero" < "Cancion_Generos"."id_genero" [delete: cascade]
+
+Ref:"Canciones"."id_cancion" < "Canciones_Autores"."id_cancion" [delete: cascade]
+
+Ref:"Autores"."id_autor" < "Canciones_Autores"."id_autor" [delete: cascade]
+
+Ref:"Albumes"."id_album" < "Albumes_Genero"."id_album" [delete: cascade]
+
+Ref:"Generos"."id_genero" < "Albumes_Genero"."id_genero" [delete: cascade]
+
+Ref:"Generos"."id_genero" < "Genero_Autores"."id_genero" [delete: cascade]
+
+Ref:"Autores"."id_autor" < "Genero_Autores"."id_autor" [delete: cascade]
+
+Ref:"Albumes"."id_album" < "Albumes_Autor"."id_album" [delete: cascade]
+
+Ref:"Autores"."id_autor" < "Albumes_Autor"."id_autor" [delete: cascade]
+
+Ref:"Podcast"."id_podcast" < "Podcast_Autores"."id_podcast" [delete: cascade]
+
+Ref:"Autores"."id_autor" < "Podcast_Autores"."id_autor" [delete: cascade]
+
+Ref:"Albumes"."id_album" < "Albumes_Discografias_Autores"."id_album" [delete: cascade]
+
+Ref:"Autores"."id_autor" < "Albumes_Discografias_Autores"."id_autor" [delete: cascade]
+
+Ref:"Discograficas"."id_discografia" < "Albumes_Discografias_Autores"."id_discografia" [delete: cascade]

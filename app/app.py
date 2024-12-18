@@ -1,14 +1,15 @@
 ﻿from flask import Flask, render_template, request, redirect, url_for
 import psycopg2
+import os
 
 app = Flask(__name__)
 
 # Conexión a la base de datos
 conn = psycopg2.connect(
-    dbname="music_db",
-    user="postgres",
-    password="admin",
-    host="localhost"
+    dbname=os.getenv('POSTGRES_DB', 'music_db'),
+    user=os.getenv('POSTGRES_USER', 'postgres'),
+    password=os.getenv('POSTGRES_PASSWORD', 'admin'),
+    host=os.getenv('DB_HOST', 'localhost')
 )
 cursor = conn.cursor()
 
