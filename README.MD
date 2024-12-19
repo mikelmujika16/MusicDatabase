@@ -1,5 +1,16 @@
 # :notes: Music Database :notes:
 
+## Autores:
+
+- **José Miguel Hernández Santana**  
+  *(alu0101101507@ull.edu.es)*  
+
+- **Ibai Heras Rodrigalvarez**  
+  *(alu0101767611@ull.edu.es)*  
+
+- **Mikel Mugica Arregui**  
+  *(alu0101773780@ull.edu.es)*
+
 ## :dizzy: Introducción
 
 Este proyecto consiste en una base de datos de música utilizando PostgreSQL. La base de datos está diseñada para almacenar información sobre artistas, álbumes, canciones y géneros musicales. Proporciona una estructura organizada y eficiente para gestionar grandes volúmenes de datos musicales y realizar consultas complejas.
