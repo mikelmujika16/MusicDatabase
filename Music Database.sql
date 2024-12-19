@@ -1,7 +1,10 @@
 -- Crear la base de datos
 
 -- Conectarse a la base de datos de música
+DROP DATABASE IF EXISTS music_db;
+CREATE DATABASE music_db;
 
+\c music_db
 
 -- Eliminar tablas existentes (en orden inverso de dependencias)
 DROP TABLE IF EXISTS Historial_Cancion CASCADE;
