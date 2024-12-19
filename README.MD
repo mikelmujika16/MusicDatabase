@@ -247,3 +247,51 @@ WHERE nombre_cancion = 'Nueva Cancion';
 
 
 Estos ejemplos cubren inserciones, actualizaciones y eliminaciones en las tablas, así como casos que deberían activar disparadores, aserciones y checks definidos en tu base de datos.
+
+
+
+### :money_with_wings: Presupuesto del Proyecto
+
+El presupuesto del proyecto se ha estimado teniendo en cuenta los siguientes factores, adaptados a un proyecto universitario:
+
+1. **Desarrollo de Software**:
+   - **Desarrolladores**: 3 estudiantes trabajando a tiempo parcial (20 horas/semana) durante 3 meses.
+
+2. **Infraestructura**:
+   - **Servidores en la nube**: Uso de servicios gratuitos o de bajo costo (por ejemplo, AWS Free Tier, Heroku Free Plan).
+
+3. **Licencias y Herramientas**:
+   - **Licencias de software**: Uso de herramientas y software gratuitos o con descuentos para estudiantes.
+
+4. **Pruebas y QA**:
+   - **Ingenieros de QA**: 1 estudiante trabajando a tiempo parcial (20 horas/semana) durante 2 meses.
+
+5. **Marketing y Publicidad**:
+   - **Promoción en redes sociales**: Uso de plataformas gratuitas y redes sociales para la promoción.
+
+6. **Contingencias**:
+   - **Imprevistos y contingencias**: 5% del presupuesto total.
+
+### Detalle del Presupuesto
+
+| Concepto                          | Cantidad | Costo Unitario | Total       |
+|-----------------------------------|----------|----------------|-------------|
+| Desarrolladores                   | 3        | $10/hora       | $7,200      |
+| Servidores en la nube             | 3 meses  | $20/mes        | $60         |
+| Licencias de software             | -        | -              | $0          |
+| Herramientas de desarrollo        | -        | -              | $0          |
+| Ingenieros de QA                  | 1        | $10/hora       | $1,600      |
+| Promoción en redes sociales       | -        | -              | $0          |
+| Imprevistos y contingencias (5%)  | -        | -              | $440        |
+| **Total**                         |          |                | **$9,300**  |
+
+### Justificación del Presupuesto
+
+- **Desarrollo de Software**: La mayor parte del presupuesto se destina al desarrollo de software, con estudiantes trabajando a tiempo parcial, lo que reduce significativamente los costos.
+- **Infraestructura**: Se ha presupuestado el uso de servicios en la nube gratuitos o de bajo costo para minimizar los gastos.
+- **Licencias y Herramientas**: Se utilizarán herramientas y software gratuitos o con descuentos para estudiantes, eliminando así estos costos.
+- **Pruebas y QA**: Se ha asignado un presupuesto para un estudiante que realice pruebas y asegure la calidad del software.
+- **Marketing y Publicidad**: Se utilizarán plataformas gratuitas y redes sociales para la promoción del proyecto, eliminando así estos costos.
+- **Contingencias**: Se ha añadido un 5% del presupuesto total para cubrir cualquier imprevisto o gasto adicional que pueda surgir durante el desarrollo del proyecto.
+
+Este presupuesto es una estimación y puede variar en función de las necesidades específicas y los cambios en el alcance del proyecto.
