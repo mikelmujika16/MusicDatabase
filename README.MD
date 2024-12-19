@@ -214,9 +214,11 @@ VALUES ('Autor Host', 'Discografia del autor host');
 
 INSERT INTO Hosts (id_autor, nombre_host) 
 VALUES ((SELECT id_autor FROM Autores WHERE nombre_autor = 'Autor Host'), 'Host Autor');
+```
 
 ![TriggerAuthor](images/9.png)
 
+```sql
 -- Intentar insertar el mismo autor en la tabla Grupos (debería fallar)
 INSERT INTO Grupos (id_autor, nombre_grupo) 
 VALUES ((SELECT id_autor FROM Autores WHERE nombre_autor = 'Autor Host'), 'Grupo del Autor Host');
