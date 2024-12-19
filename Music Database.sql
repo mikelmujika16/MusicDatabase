@@ -265,7 +265,6 @@ CREATE TABLE Albumes_Discografias_Autores (
     FOREIGN KEY (id_autor) REFERENCES Autores(id_autor) ON DELETE CASCADE,
     FOREIGN KEY (id_discografia) REFERENCES Discograficas(id_discografia) ON DELETE CASCADE
 );
--- Script para CHECKs y TRIGGERs necesarios en la base de datos de música
 
 -- CHECKs para las tablas principales
 
