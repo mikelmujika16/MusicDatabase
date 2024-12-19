@@ -12,11 +12,11 @@ Para ver la documentación del proyecto y todas las relaciones de clases en la p
 
 ## :bar_chart: Modelo Entidad-Relación
 
-![Modelo Entidad-Relación](Diagramas\EntidadRelacionMusica.png)
+![Modelo Entidad-Relación](Diagramas/EntidadRelacionMusica.png)
 
 ## :bar_chart: Modelo Relacional
 
-![Modelo Relacional](Diagramas\MusicDB.png)
+![Modelo Relacional](Diagramas/MusicDB.png)
 
 ## :hammer_and_wrench: Requisitos del Proyecto
 
@@ -112,7 +112,7 @@ Para realizar consultas de prueba, eliminaciones y actualizaciones en las difere
 SELECT * FROM Usuarios;
 ```
 
-![selectUsuarios](images\1.png)
+![selectUsuarios](images/1.png)
 
 #### Consultar todas las canciones
 
@@ -120,7 +120,7 @@ SELECT * FROM Usuarios;
 SELECT * FROM Canciones;
 ```
 
-![selectCanciones](images\2.png)
+![selectCanciones](images/2.png)
 
 #### Consultar todas las playlists
 
@@ -128,7 +128,7 @@ SELECT * FROM Canciones;
 SELECT * FROM Playlists;
 ```
 
-![selectPlayLists](images\3.png)
+![selectPlayLists](images/3.png)
 
 ### Inserciones de Prueba
 
@@ -139,7 +139,7 @@ INSERT INTO Usuarios (nombre, apellido, nickname, email)
 VALUES ('Carlos', 'Lopez', 'carlitos', 'carlos.lopez@example.com');
 ```
 
-![insertUsuario](images\13.png)
+![insertUsuario](images/13.png)
 
 #### Insertar una nueva cancion
 
@@ -147,7 +147,7 @@ VALUES ('Carlos', 'Lopez', 'carlitos', 'carlos.lopez@example.com');
 INSERT INTO Canciones (nombre_cancion, duracion, n_reproducciones, ano_salida) VALUES ('Nueva Cancion', '03:45', 0, 2023);
 ```
 
-![insertCancion](images\8.png)
+![insertCancion](images/8.png)
 
 #### Insertar un nuevo autor y asociarlo a un grupo
 
@@ -159,7 +159,7 @@ INSERT INTO Grupos (id_autor, nombre_grupo)
 VALUES ((SELECT id_autor FROM Autores WHERE nombre_autor = 'Nuevo Autor'), 'Nuevo Grupo');
 ```
 
-![insertHost](images\4.png)
+![insertHost](images/4.png)
 
 ### Actualizaciones de Prueba
 
@@ -171,7 +171,7 @@ SET nombre = 'julen'
 WHERE nickname = 'juanp';
 ```
 
-![updateUser](images\5.png)
+![updateUser](images/5.png)
 
 #### Actualizar el nombre de una canción
 
@@ -181,7 +181,7 @@ SET nombre_cancion = 'Cancion Actualizada'
 WHERE nombre_cancion = 'Nueva Cancion';
 ```
 
-![updateSong](images\15.png)
+![updateSong](images/15.png)
 
 ### Eliminaciones de Prueba
 
@@ -192,7 +192,7 @@ DELETE FROM Usuarios
 WHERE nickname = 'carlitos';
 ```
 
-![deleteUser](images\7.png)
+![deleteUser](images/7.png)
 
 #### Eliminar una canción
 
@@ -201,7 +201,7 @@ DELETE FROM Canciones
 WHERE nombre_cancion = 'Cancion Actualizada';
 ```
 
-![deleteSong](images\14.png)
+![deleteSong](images/14.png)
 
 ### Casos de Disparadores, Aserciones y Checks
 
@@ -215,7 +215,7 @@ VALUES ('Autor Host', 'Discografia del autor host');
 INSERT INTO Hosts (id_autor, nombre_host) 
 VALUES ((SELECT id_autor FROM Autores WHERE nombre_autor = 'Autor Host'), 'Host Autor');
 
-![TriggerAuthor](images\9.png)
+![TriggerAuthor](images/9.png)
 
 -- Intentar insertar el mismo autor en la tabla Grupos (debería fallar)
 INSERT INTO Grupos (id_autor, nombre_grupo) 
@@ -223,7 +223,7 @@ VALUES ((SELECT id_autor FROM Autores WHERE nombre_autor = 'Autor Host'), 'Grupo
 ```
 
 
-![TriggerAuthor2](images\10.png)
+![TriggerAuthor2](images/10.png)
 
 #### Insertar una canción con duración negativa (debería fallar por el check)
 
@@ -233,7 +233,7 @@ VALUES ('Cancion Invalida', '-03:45', 0, 2023);
 ```
 
 
-![checkSongDuration](images\11.png)
+![checkSongDuration](images/11.png)
 
 #### Actualizar el número de reproducciones de una canción a un valor negativo (debería fallar por el check)
 
@@ -243,7 +243,7 @@ SET n_reproducciones = -10
 WHERE nombre_cancion = 'Nueva Cancion';
 ```
 
-![chechkSOngRepros](images\12.png)
+![chechkSOngRepros](images/12.png)
 
 
 Estos ejemplos cubren inserciones, actualizaciones y eliminaciones en las tablas, así como casos que deberían activar disparadores, aserciones y checks definidos en tu base de datos.
